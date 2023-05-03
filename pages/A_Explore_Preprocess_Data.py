@@ -1,13 +1,15 @@
 import pandas as pd                     # pip install pandas
 import streamlit as st                  # pip install streamlit
 import string
+import tkinter
+import matplotlib
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 from PIL import Image
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from helper_functions import fetch_dataset, clean_data, summarize_review_data, display_review_keyword, remove_review
-
+matplotlib.use( 'agg')
 #############################################
 
 st.markdown("# Practical Applications of Machine Learning (PAML)")
@@ -161,7 +163,7 @@ def tf_idf_encoder(df, feature, word_encoder):
 #        width = 3000,
 #        height = 2000,
 #        background_color = 'black',
-#        font_path = font_path
+#        #font_path = font_path
 #    ).generate(str(text)),
 #    fig = plt.figure(
 #        figsize = (40, 30),
@@ -174,9 +176,12 @@ def tf_idf_encoder(df, feature, word_encoder):
 
 def generate_word_cloud(text):
     wordcloud = WordCloud().generate(str(text))
-    plt.imshow(wordcloud, interpolation = 'bilinear')
+    #plt.imshow(wordcloud, interpolation = 'bilinear')
     plt.axis("off")
-    plt.show()
+    fig, ax = plt.subplots(figsize = (12, 8))
+    ax.imshow(wordcloud)
+    st.pyplot(fig)
+    #plt.show()
 ###################### FETCH DATASET #######################
 df = None
 df = fetch_dataset()
@@ -270,12 +275,20 @@ if df is not None:
 
     ############## World Cloud
     st.markdown('### Select feature to create word cloud')
+    article_subjects = list(set(df.subject.values))
+    article_subjects.append('all')
     cloud_feature = st.multiselect(
-        'Select features to create word cloud',
-        df.columns,
+        'Select article subject or all to see all subjects to create word cloud',
+        article_subjects,
     )
     if (cloud_feature):
-        generate_word_cloud(cloud_feature)
+        for x in cloud_feature:
+            if x == 'all':
+                generate_word_cloud(df.text.values)
+            else:
+                t = df.loc[df['subject'] == x]
+                generate_word_cloud(t.text.values)
+
 
     # Show updated dataset
     if (text_feature_select_int or text_feature_select_onehot):
