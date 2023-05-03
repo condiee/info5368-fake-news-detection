@@ -1,6 +1,9 @@
 import pandas as pd                     # pip install pandas
 import streamlit as st                  # pip install streamlit
 import string
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+from PIL import Image
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from helper_functions import fetch_dataset, clean_data, summarize_review_data, display_review_keyword, remove_review
@@ -151,6 +154,29 @@ def tf_idf_encoder(df, feature, word_encoder):
     st.session_state['tfidf_transformer'] = tfidf_transformer
     return df
 
+
+#def generate_word_cloud(text):
+#    font_path = '/System/Library/Fonts/Geneva.ttf'
+#    wordcloud = WordCloud(
+#        width = 3000,
+#        height = 2000,
+#        background_color = 'black',
+#        font_path = font_path
+#    ).generate(str(text)),
+#    fig = plt.figure(
+#        figsize = (40, 30),
+#        facecolor = 'k',
+#       edgecolor = 'k')
+#    plt.imshow(wordcloud, interpolation = 'bilinear')
+#    plt.axis('off')
+#    plt.tight_layout(pad=0)
+#    plt.show()
+
+def generate_word_cloud(text):
+    wordcloud = WordCloud().generate(str(text))
+    plt.imshow(wordcloud, interpolation = 'bilinear')
+    plt.axis("off")
+    plt.show()
 ###################### FETCH DATASET #######################
 df = None
 df = fetch_dataset()
@@ -162,12 +188,6 @@ if df is not None:
     st.markdown('Upload successful. See the unprocessed dataset below.')
 
     st.dataframe(df)
-
-    # Remove irrelevant features
-    df, data_cleaned = clean_data(df)
-    if (data_cleaned):
-        st.markdown('The dataset has been cleaned. You\'re welcome!')
-        st.dataframe(df)
 
     ############## Task 1: Remove Punctation
     st.markdown('### Remove punctuation from features')
@@ -182,10 +202,10 @@ if df is not None:
         st.write('Punctuation was removed from {}'.format(removed_p_features))
 
     # Summarize reviews
-    st.markdown('### Summarize Reviews')
+    st.markdown('### Summarize Articles')
     object_columns = df.select_dtypes(include=['object']).columns
     summarize_reviews = st.selectbox(
-        'Select the reviews from the dataset',
+        'Select the feature from the dataset',
         object_columns,
     )
     if(summarize_reviews):
@@ -193,10 +213,10 @@ if df is not None:
         summary = summarize_review_data(df, summarize_reviews)
 
     # Inspect Reviews
-    st.markdown('### Inspect Reviews')
+    st.markdown('### Inspect Articles')
 
     review_keyword = st.text_input(
-        "Enter a keyword to search in reviews",
+        "Enter a keyword to search in articles",
         key="review_keyword",
     )
 
@@ -208,9 +228,9 @@ if df is not None:
         st.write(displaying_review)
 
     # Remove Reviews: number_input for index of review to remove
-    st.markdown('### Remove Irrelevant/Useless Reviews')
+    st.markdown('### Remove Irrelevant/Useless Articles')
     review_idx = st.number_input(
-        label='Enter review index',
+        label='Enter article index',
         min_value=0,
         max_value=len(df),
         value=0,
@@ -218,7 +238,7 @@ if df is not None:
 
     if (review_idx):
         df = remove_review(df, review_idx)
-        st.write('Review at index {} has been removed'.format(review_idx))
+        st.write('Article at index {} has been removed'.format(review_idx))
 
     # Handling Text and Categorical Attributes
     st.markdown('### Handling Text and Categorical Attributes')
@@ -244,6 +264,18 @@ if df is not None:
         )
         if (text_feature_select_onehot and st.button('TF-IDF Encoder')):
             df = tf_idf_encoder(df, text_feature_select_onehot, word_encoder)
+
+
+
+
+    ############## World Cloud
+    st.markdown('### Select feature to create word cloud')
+    cloud_feature = st.multiselect(
+        'Select features to create word cloud',
+        df.columns,
+    )
+    if (cloud_feature):
+        generate_word_cloud(cloud_feature)
 
     # Show updated dataset
     if (text_feature_select_int or text_feature_select_onehot):

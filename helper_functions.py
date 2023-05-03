@@ -142,10 +142,10 @@ def summarize_review_data(df, reviews_col, top_n=3):
     st.write('### Average word count')
     st.write('Average word count: {}'.format(out_dict['average_word_count']))
 
-    st.write('### N reviews with most words')
+    st.write('### N articles with most words')
     st.dataframe(out_dict['top_n_reviews_most_words'])
 
-    st.write('### N reviews with least words:')
+    st.write('### N articles with least words:')
     st.dataframe(out_dict['top_n_reviews_least_words'])
 
     return out_dict
@@ -162,7 +162,7 @@ def display_review_keyword(df, keyword, n_reviews=5):
     Output: 
         - None
     """
-    keyword_df = df['reviews'].str.contains(keyword)
+    keyword_df = df['text'].str.contains(keyword)
     filtered_df = df[keyword_df].head(n_reviews)
 
     return filtered_df
