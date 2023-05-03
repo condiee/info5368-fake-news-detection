@@ -11,10 +11,6 @@ st.markdown("# Practical Applications of Machine Learning (PAML)")
 
 #############################################
 
-st.markdown("### Homework 3 - Predicting Product Review Sentiment Using Classification")
-
-#############################################
-
 st.markdown('# Explore & Preprocess Dataset')
 
 #############################################
@@ -163,7 +159,7 @@ if df is not None:
 
     # Display original dataframe
     st.markdown('View initial data with missing values or invalid inputs')
-    st.markdown('You have uploaded the Amazon Product Reviews dataset. Millions of Amazon customers have contributed over a hundred million reviews to express opinions and describe their experiences regarding products on the Amazon.com website. See the unprocesses dataset below.')
+    st.markdown('Upload successful. See the unprocessed dataset below.')
 
     st.dataframe(df)
 
