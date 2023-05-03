@@ -9,7 +9,6 @@ from PIL import Image
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from helper_functions import fetch_dataset, clean_data, summarize_review_data, display_review_keyword, remove_review
-matplotlib.use( 'agg')
 #############################################
 
 st.markdown("# Practical Applications of Machine Learning (PAML)")
