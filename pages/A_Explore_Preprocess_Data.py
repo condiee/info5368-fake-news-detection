@@ -23,7 +23,6 @@ st.markdown('# Explore & Preprocess Dataset')
 def remove_punctuation(df, features):
     """
     This function removes punctuation from features (i.e., product reviews)
-
     Input: 
         - df: the pandas dataframe
         - feature: the features to remove punctation
@@ -59,7 +58,6 @@ def remove_punctuation(df, features):
 def word_count_encoder(df, feature, word_encoder):
     """
     This function performs word count encoding on feature in the dataframe
-
     Input: 
         - df: the pandas dataframe
         - feature: the feature(s) to perform word count encoding
@@ -107,7 +105,6 @@ def word_count_encoder(df, feature, word_encoder):
 def tf_idf_encoder(df, feature, word_encoder):
     """
     This function performs tf-idf encoding on the given features
-
     Input: 
         - df: the pandas dataframe
         - feature: the feature(s) to perform tf-idf encoding
@@ -193,6 +190,41 @@ if df is not None:
 
     st.dataframe(df)
 
+    st.markdown('### Visualize Features')
+
+    ############## World Cloud
+    st.markdown('## Word Cloud')
+    st.markdown('Select subject to create word cloud')
+    article_subjects = list(set(df.subject.values))
+    article_subjects.append('all')
+    cloud_feature = st.multiselect(
+        'Select article subject or all to see all subjects to create word cloud',
+        article_subjects,
+    )
+    if (cloud_feature):
+        for x in cloud_feature:
+            if x == 'all':
+                generate_word_cloud(df.text.values)
+            else:
+                t = df.loc[df['subject'] == x]
+                generate_word_cloud(t.text.values)
+    
+    st.markdown('## Feature Graphs')
+    st.markdown('Select feature to view graphically')
+    graph_sub = ['label', 'subject']
+    graph_feature = st.multiselect(
+        'Select feature to view',
+        graph_sub,
+    )
+    if (graph_feature):
+        for x in graph_feature:
+            if x == 'label':
+                st.bar_chart(df.label.value_counts())
+            elif x == 'subject':
+                st.bar_chart(df.subject.value_counts())
+
+    
+
     ############## Task 1: Remove Punctation
     st.markdown('### Remove punctuation from features')
     removed_p_features = st.multiselect(
@@ -268,25 +300,6 @@ if df is not None:
         )
         if (text_feature_select_onehot and st.button('TF-IDF Encoder')):
             df = tf_idf_encoder(df, text_feature_select_onehot, word_encoder)
-
-
-
-
-    ############## World Cloud
-    st.markdown('### Select feature to create word cloud')
-    article_subjects = list(set(df.subject.values))
-    article_subjects.append('all')
-    cloud_feature = st.multiselect(
-        'Select article subject or all to see all subjects to create word cloud',
-        article_subjects,
-    )
-    if (cloud_feature):
-        for x in cloud_feature:
-            if x == 'all':
-                generate_word_cloud(df.text.values)
-            else:
-                t = df.loc[df['subject'] == x]
-                generate_word_cloud(t.text.values)
 
 
     # Show updated dataset

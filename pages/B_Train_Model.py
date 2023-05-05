@@ -2,7 +2,12 @@ import numpy as np                      # pip install numpy
 from sklearn.model_selection import train_test_split
 import streamlit as st                  # pip install streamlit
 from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+import tensorflow as tf
+from tensorflow import keras
 import random
 from helper_functions import fetch_dataset, set_pos_neg_reviews
 random.seed(10)
@@ -83,6 +88,8 @@ def split_dataset(df, number, target, feature_encoding, random_state=42):
 
     return X_train_sentiment, X_val_sentiment, y_train, y_val
 
+#logistic regression, random forest, SVM, naive bayes, CNN
+
 # Checkpoint 5
 def train_logistic_regression(X_train, y_train, model_name, params, random_state=42):
     """
@@ -118,89 +125,129 @@ def train_logistic_regression(X_train, y_train, model_name, params, random_state
     # 5. Return the trained model
     return lg_model
 
-# Checkpoint 6
-def train_sgd_classifer(X_train, y_train, model_name, params, random_state=42):
-    """
-    This function trains a classification model with stochastic gradient descent
+def train_random_forest(X_train, y_train, model_name, params, random_state=42):
 
-    Input:
-        - X_train: training features
-        - y_train: training targets
-        - model_name: (string) model name
-        - params: a dictionary of the hyperparameters to tune during cross validation
-        - random_state: determines random number generation for centroid initialization
-    Output:
-        - ridge_cv: the trained model
-    """
-    sgd_model = None
+    rf_model = None
     # Add code here
-    # print(params)
-    if params['loss'] == 'log_loss': # hardcode in case github classroom has incorrect test (changed it locally)
-        params['loss'] = 'log'
-    # 1. Create a try and except block to train a logistic regression model with Stochastic Gradient Descent algorithm
-    try: 
-        # 2. Create a SGDClassifier class object using the random_state and params as input.
-        # print(params)
-        sgd_model = SGDClassifier(random_state=random_state, loss=params['loss'], penalty=params['penalty'],
-                                  alpha=params['alpha'], max_iter=params['max_iter'], tol=params['tol'])
-        
+    # 1. Create a try and except block to train a logistic regression model.
+    try:
+        # 2. Create a LogisticRegression class object using the random_state as input.
+        rf_model = RandomForestClassifier(random_state=random_state, n_estimators=params['n_estimators'], 
+                                      max_depth=params['max_depth'])
+
         # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
         # Remember to create a continuous y_train array using np.ravel() function.
-        sgd_model.fit(X_train, np.ravel(y_train))
-
-        # 4. Save the model in st.session_state[model_name].
-        st.session_state[model_name] = sgd_model
+        rf_model.fit(X_train, y_train)
     
-    except Exception as e:
-        print('Exception thrown; cannot train Stochastic Gradient Descent classifier:', e)
-        
-    # 5. Return the model
-    return sgd_model
+        # 4. Save the model in st.session_state[model_name].
+        st.session_state[model_name] = rf_model
 
-# Checkpoint 7
-def train_sgdcv_classifer(X_train, y_train, model_name, params, cv_params, random_state=42):
-    """
-    This function trains a classification model with stochastic gradient descent and cross validation
+    except:
+        print('Exception thrown; cannot train random forest model')
 
-    Input:
-        - X_train: training features
-        - y_train: training targets
-        - model_name: (string) model name
-        - params: a dictionary of the SGD hyperparameters
-        - cv_params: a dictionary of the hyperparameters to tune during cross validation
-        - random_state: determines random number generation for centroid initialization
-    Output:
-        - sgdcv_model: the trained model
-    """
-    sgdcv_model = None
+    # 5. Return the trained model
+    return rf_model
+
+def train_svm(X_train, y_train, model_name, params, random_state=42):
+    
+    svm_model = None
     # Add code here
-    # print("PARAMS", params)
-    if params['loss'] == ['log_loss']: # hardcode in case github classroom has incorrect test (changed it locally)
-        params['loss'] = ['log']
-    st.write("PARAMS", params)
-    st.write("OTHERS", cv_params)
+    # 1. Create a try and except block to train a logistic regression model.
+    try:
+        # 2. Create a LogisticRegression class object using the random_state as input.
+        svm_model = SVC(random_state=random_state, kernal=params['kernal'], 
+                                      C=params['C'])
 
-    # 1. Create a try and except block to train a logistic regression model with Stochastic
-    # Gradient Descent algorithm with Repeated K-Fold Cross Validation and search for the
-    # optimal parameters with gridsearch.
-    try: 
-        # 2. Find the optimal hyperparameters using GridSearchCV with SGDClassifier as the estimator
-        sgdcv_model = GridSearchCV(estimator=SGDClassifier(random_state=random_state), param_grid=params, cv=cv_params['n_splits'])
-        # print('hello')
-        # 3. Fit the model to the data using the fit() function
-        sgdcv_model.fit(X_train, np.ravel(y_train))
+        # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
+        # Remember to create a continuous y_train array using np.ravel() function.
+        svm_model.fit(X_train, y_train)
+    
+        # 4. Save the model in st.session_state[model_name].
+        st.session_state[model_name] = svm_model
+
+    except:
+        print('Exception thrown; cannot train random forest model')
+
+    # 5. Return the trained model
+    return svm_model
+
+def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
+    
+    nb_model = None
+    # Add code here
+    # 1. Create a try and except block to train a logistic regression model.
+    try:
+        # 2. Create a LogisticRegression class object using the random_state as input.
+        nb_model = GaussianNB()
+
+        # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
+        # Remember to create a continuous y_train array using np.ravel() function.
+        nb_model.fit(X_train, y_train)
+    
+        # 4. Save the model in st.session_state[model_name].
+        st.session_state[model_name] = nb_model
+
+    except:
+        print('Exception thrown; cannot train random forest model')
+
+    # 5. Return the trained model
+    return nb_model
+
+def train_svm(X_train, y_train, model_name, params, random_state=42):
+    
+    svm_model = None
+    # Add code here
+    # 1. Create a try and except block to train a logistic regression model.
+    try:
+        # 2. Create a LogisticRegression class object using the random_state as input.
+        svm_model = SVC(random_state=random_state, kernal=params['kernal'], 
+                                      C=params['C'])
+
+        # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
+        # Remember to create a continuous y_train array using np.ravel() function.
+        svm_model.fit(X_train, y_train)
+    
+        # 4. Save the model in st.session_state[model_name].
+        st.session_state[model_name] = svm_model
+
+    except:
+        print('Exception thrown; cannot train random forest model')
+
+    # 5. Return the trained model
+    return svm_model
+
+def train_CNN(X_train, y_train, X_test, y_test, model_name, params, random_state=42):
+    
+    cnn_model = None
+    # Add code here
+    # 1. Create a try and except block to train a logistic regression model.
+    try:
+        # 2. Create a LogisticRegression class object using the random_state as input.
+        cnn_model = keras.Sequential([
+            keras.layers.Conv2D(filters=32, kernel_size=(3,3), activation='relu', input_shape=(28,28,1)),
+            keras.layers.MaxPooling2D(pool_size=(2,2)),
+            keras.layers.Conv2D(filters=64, kernel_size=(3,3), activation='relu'),
+            keras.layers.MaxPooling2D(pool_size=(2,2)),
+            keras.layers.Flatten(),
+            keras.layers.Dense(units=128, activation='relu'),
+            keras.layers.Dense(units=10, activation='softmax')])
         
-        # 4. Save the cross validation results (sgd_cv_model.cv_results_) in
-        st.session_state['cv_results_'] = sgdcv_model.cv_results_
+        cnn_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-        # 5. Save the best model estimator in st.session_state[model_name]
-        st.session_state[model_name] = sgdcv_model.best_estimator_
 
-    except Exception as e: 
-        print('Exception thrown; cannot train GridSearch CV classifier:', e)
+        # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
+        # Remember to create a continuous y_train array using np.ravel() function.
+        cnn_model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test,y_test))
+    
+        # 4. Save the model in st.session_state[model_name].
+        st.session_state[model_name] = cnn_model
 
-    # 5. Return the best model estimator
-    return sgdcv_model.best_estimator_
+    except:
+        print('Exception thrown; cannot train random forest model')
+
+    # 5. Return the trained model
+    return cnn_model
+
 
 # Checkpoint 8
 
