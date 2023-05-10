@@ -2,6 +2,10 @@ import numpy as np                      # pip install numpy
 import pandas as pd                     # pip install pandas
 import streamlit as st                  # pip install streamlit
 from sklearn.metrics import recall_score, precision_score, accuracy_score
+import re
+
+import string
+from nltk.corpus import stopwords
 
 # All pages
 def fetch_dataset():
@@ -28,6 +32,31 @@ def fetch_dataset():
     return df
 
 # Page A
+
+
+def clean_text(text):
+    '''Make text lowercase, remove text in square brackets,remove links,remove punctuation
+    and remove words containing numbers.'''
+    text = str(text).lower()
+    text = re.sub('\[.*?\]', '', text)
+    text = re.sub('https?://\S+|www\.\S+', '', text)
+    text = re.sub('<.*?>+', '', text)
+    text = re.sub('[%s]' % re.escape(string.punctuation), '', text)
+    text = re.sub('\n', '', text)
+    text = re.sub('\w*\d\w*', '', text)
+    return text
+
+stop_words = stopwords.words('english')
+more_stopwords = ['u', 'im', 'c']
+stop_words = stop_words + more_stopwords
+
+def remove_stopwords(text):
+    words = text.split(' ')
+    words = [word for word in words if word not in stop_words]
+    text = ' '.join(words)
+    return text
+
+
 def clean_data(df):
     """
     This function removes all feature but 'reviews.text', 'reviews.title', and 'reviews.rating'
@@ -41,24 +70,12 @@ def clean_data(df):
     """
     data_cleaned = False
     # Simplify relevant columns names
-    if ('reviews.rating' in df.columns):
-        df['rating'] = df['reviews.rating']
-        df.drop(['reviews.rating'], axis=1, inplace=True)
-
-    if ('reviews.text' in df.columns):
-        df['reviews'] = df['reviews.text']
-        df.drop(['reviews.text'], axis=1, inplace=True)
-
-    if ('reviews.title' in df.columns):
-        df['title'] = df['reviews.title']
-        df.drop(['reviews.title'], axis=1, inplace=True)
-
-    # Drop irrelevant columns
-    relevant_cols = ['reviews', 'rating', 'title']
-    df = df.loc[:, relevant_cols]
+    if ('text' in df.columns):
+        df['text'] = df['text'].apply(clean_text)
+        df['text'] = df['text'].apply(remove_stopwords)
 
     # Drop Nana
-    df.dropna(subset=['rating', 'reviews', 'title'], inplace=True)
+    df.dropna(subset=['title', 'subject', 'text'], inplace=True)
     df.reset_index(drop=True, inplace=True)
     df.head()
     data_cleaned = True

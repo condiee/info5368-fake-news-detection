@@ -190,6 +190,13 @@ if df is not None:
 
     st.dataframe(df)
 
+    # Remove irrelevant features
+    df, data_cleaned = clean_data(df)
+    if (data_cleaned):
+        st.markdown('The dataset has been cleaned. Your welcome!')
+        st.markdown('Cleaned Dataset')
+        st.dataframe(df)
+
     st.markdown('### Visualize Features')
 
     ############## World Cloud
