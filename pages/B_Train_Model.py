@@ -6,7 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
-from tensorflow import keras
+#from tensorflow import keras
 import random
 from helper_functions import fetch_dataset, set_pos_neg_reviews
 random.seed(10)

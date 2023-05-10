@@ -68,6 +68,16 @@ def compute_eval_metrics(X, y_true, model, metrics):
 
     return metric_dict
 
+
+#confusion matrix
+def compute_cm (y_test, pred):
+    cm_cv = confusion_matrix(y_test, pred)
+    cm_cv = pd.DataFrame(cm_cv, index=[0,1], columns=[0,1])
+    cm_cv.index.name = 'Actual'
+    cm_cv.columns.name = 'Predicted'
+    plt.figure(figsize = (10,10))
+    sns.heatmap(cm_cv,cmap= "Blues",annot = True, fmt='')
+
 # Checkpoint 10
 def plot_roc_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
     """
