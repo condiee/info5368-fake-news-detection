@@ -5,7 +5,8 @@ from sklearn.metrics import recall_score, precision_score, accuracy_score
 import re
 
 import string
-from nltk.corpus import stopwords
+# import nltk
+from nltk.corpus import stopwords # must download stopwords
 
 # All pages
 def fetch_dataset():
@@ -153,16 +154,17 @@ def summarize_review_data(df, reviews_col, top_n=3):
         top_n, 'Number of Words')#[['reviews']]
     
     # Display summary
-    st.write('### Total number of words')
+    st.write(f'### Showing Stats for {reviews_col}')
+    st.write('#### Total number of words')
     st.write('Total number of words: {}'.format(out_dict['total_num_words']))
 
-    st.write('### Average word count')
+    st.write('#### Average word count')
     st.write('Average word count: {}'.format(out_dict['average_word_count']))
 
-    st.write('### N articles with most words')
+    st.write(f'#### {top_n} articles with most words')
     st.dataframe(out_dict['top_n_reviews_most_words'])
 
-    st.write('### N articles with least words:')
+    st.write(f'#### {top_n} articles with least words:')
     st.dataframe(out_dict['top_n_reviews_least_words'])
 
     return out_dict

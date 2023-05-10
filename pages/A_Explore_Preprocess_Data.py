@@ -193,7 +193,7 @@ if df is not None:
     # Remove irrelevant features
     df, data_cleaned = clean_data(df)
     if (data_cleaned):
-        st.markdown('The dataset has been cleaned. Your welcome!')
+        # st.markdown('The dataset has been cleaned. Your welcome!')
         st.markdown('Cleaned Dataset')
         st.dataframe(df)
 
@@ -245,7 +245,7 @@ if df is not None:
         st.write('Punctuation was removed from {}'.format(removed_p_features))
 
     # Summarize reviews
-    st.markdown('### Summarize Articles')
+    st.markdown('### Describe Data')
     object_columns = df.select_dtypes(include=['object']).columns
     summarize_reviews = st.selectbox(
         'Select the feature from the dataset',
