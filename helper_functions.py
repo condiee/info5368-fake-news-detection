@@ -56,7 +56,7 @@ def remove_stopwords(text):
     text = ' '.join(words)
     return text
 
-
+# pulled from https://www.kaggle.com/code/stpeteishii/fake-real-news-vectorizer-lightning-linear
 def clean_data(df):
     """
     This function removes all feature but 'reviews.text', 'reviews.title', and 'reviews.rating'
