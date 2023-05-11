@@ -69,13 +69,15 @@ def compute_eval_metrics(X, y_true, model, metrics):
 
 
 #confusion matrix
-def compute_cm (y_test, pred):
-    cm_cv = confusion_matrix(y_test, pred)
-    cm_cv = pd.DataFrame(cm_cv, index=[0,1], columns=[0,1])
-    cm_cv.index.name = 'Actual'
-    cm_cv.columns.name = 'Predicted'
-    plt.figure(figsize = (10,10))
-    sns.heatmap(cm_cv,cmap= "Blues",annot = True, fmt='')
+## referenced https://www.kaggle.com/code/sahrul/fake-news-detection-using-cnn
+def plot_cmatrix(X, y_true, model, metrics):
+    y_pred = model.predict(X)
+    cmatrix = confusion_matrix(y_true, y_pred)
+    cmatrix - pd.dataFrame(cmatrix, index = [0, 1], columns = [0, 1])
+    cm_cv.index.name = "Actual"
+    cm_cv.columns.name = "Predicted"
+    plt.figure(figsize = (10, 10))
+    sns.heatmap(cmatrix, cmap = "Blues", annot = True, fmt = '')
 
 # Checkpoint 10
 def plot_pr_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
@@ -290,13 +292,17 @@ if df is not None:
         if 'eval_button_clicked' in st.session_state and st.session_state['eval_button_clicked']:
             st.markdown('## Review Classification Model Performance')
 
-            plot_options = ['Precision/Recall Curve', 'ROC Curve', 'Metric Results']
+            plot_options = ['Precision/Recall Curve', 'ROC Curve', 'Metric Results', 'Confusion Matrix']
 
             review_plot = st.multiselect(
                 label='Select plot option(s)',
                 options=plot_options
             )
             ############## Task 10: Compute evaluation metrics
+            if 'Confusion Matrix' in review_plot:
+                trained_select = [st.session_state[model]
+                                  for model in model_select]
+                plot_cmatrix(X_train, y_train, model, metric_select)
             if 'Precision/Recall Curve' in review_plot:
                 trained_select = [st.session_state[model]
                                   for model in model_select]
