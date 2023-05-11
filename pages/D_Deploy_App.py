@@ -11,10 +11,6 @@ st.markdown("## Real or Fake News?")
 st.markdown("On this page, you can use one of the models you have trained to predict whether a news article is real or fake news. You can also detect the sentiment of the article.")
 
 #############################################
-
-st.title('Deploy Application')
-
-#############################################
 enc = OrdinalEncoder()
 
 # Checkpoint 11
@@ -41,23 +37,34 @@ def deploy_model(text):
 
 ###################### FETCH DATASET #######################
 df = None
-if 'data' in st.session_state:
+if 'data' in st.session_state and 'trained_models' in st.session_state and st.session_state['trained_models'] != []:
     df = st.session_state['data']
+    # st.write(st.session_state)
+
+    # Select a model to deploy from the trained models
+    st.markdown("### Choose which model you would like to deploy to predict article sentiment and integrity:")
+    model_select = st.selectbox(
+        label='Select from your trained models:',
+        options = st.session_state['trained_models'],
+    )
+
+    if (model_select):
+        st.write('You selected the model: {}'.format(model_select))
+        st.session_state['deploy_model'] = st.session_state[model_select]
+
 else:
-    st.write('#### Please upload a dataset on page A to train a model before deployment.')
+    st.write('*Please upload a dataset on page A and train and test a machine learning model on pages B and C in order to deploy your model on this page.*')
 
 # Deploy App!
 if df is not None:
     #df.dropna(inplace=True)
     st.markdown('### Introducing the ML Powered Review Application')
 
-    # Perform error checking for strings, chars, etc (garbage)
-
     # Input review
-    st.markdown('### Use a trained classification method to automatically predict positive and negative reviews')
+    st.markdown('### Use a trained classification method to automatically predict the sentiment of a news article and whether it is real and fake news.')
     
     user_input = st.text_input(
-        "Enter a review",
+        "Enter the body of a news article (you're welcome to include the title at the beginning as well):",
         key="user_review",
     )
     if (user_input):
@@ -78,12 +85,17 @@ if df is not None:
             
             #product_sentiment = st.session_state["deploy_model"].predict(encoded_user_input)
             product_sentiment = deploy_model(encoded_user_input)
+            sentiment = None
 
             st.write("**Sentiment prediction:**", product_sentiment[0])
 
             if(product_sentiment == 1):
-                st.write('The product has a positive sentiment')
+                sentiment = "positive"
             elif product_sentiment == -1:
-                st.write('The product has a negative sentiment')
+                sentiment = "negative"
+
+            if sentiment:
+                st.write(f'Your trained model predicts that the news article has a {sentiment} sentiment.')
+
 
 

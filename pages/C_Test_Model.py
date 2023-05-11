@@ -4,7 +4,7 @@ import streamlit as st                  # pip install streamlit
 import random
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from helper_functions import fetch_dataset, compute_precision, compute_recall, compute_accuracy, apply_threshold
+from helper_functions import compute_f1, fetch_dataset, compute_precision, compute_recall, compute_accuracy, apply_threshold
 from sklearn.metrics import recall_score, precision_score
 from pages.B_Train_Model import split_dataset
 
@@ -28,13 +28,14 @@ st.title('Test Model')
 METRICS_MAP = {
     'precision': compute_precision,
     'recall': compute_recall,
-    'accuracy': compute_accuracy
+    'accuracy': compute_accuracy,
+    'f1': compute_f1
 }
 
 # Checkpoint 9
 def compute_eval_metrics(X, y_true, model, metrics):
     """
-    This function computes one or more metrics (precision, recall, accuracy) using the model
+    This function computes one or more metrics (precision, recall, accuracy, f1 score) using the model
 
     Input:
         - X: pandas dataframe with training features
@@ -62,6 +63,9 @@ def compute_eval_metrics(X, y_true, model, metrics):
         elif metric == 'accuracy':
             # result = np.sum(pred == y_true.to_numpy().reshape(-1)) / len(X)
             result = compute_accuracy(y_true, pred)
+        elif metric == 'f1 score':
+            # result = np.sum(pred == y_true.to_numpy().reshape(-1)) / len(X)
+            result = compute_f1(y_true, pred)
         
         # b. Store the result in out_dict[metric_name]
         metric_dict[metric] = result
@@ -79,9 +83,9 @@ def compute_cm (y_test, pred):
     sns.heatmap(cm_cv,cmap= "Blues",annot = True, fmt='')
 
 # Checkpoint 10
-def plot_roc_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
+def plot_pr_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
     """
-    Plot the ROC curve between predicted and actual values for model names in trained_models on the training and validation datasets
+    Plot the Precision/Recall curve between predicted and actual values for model names in trained_models on the training and validation datasets
 
     Input:
         - X_train: training input data
@@ -142,7 +146,7 @@ def plot_roc_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
             val_recall = recall_score(y_val, val_predictions)
             val_recall_all += [val_recall]
 
-        # 2. Plot a ROC Curves showing the results on training and validation sets using the
+        # 2. Plot a Precision/Recall Curves showing the results on training and validation sets using the
         # train_precision_all, train_recall_all, val_precision_all, and val_recall_all. Plot precision on
         # the y-axis and recall on the x-axis (see code snippet below.
         fig.add_trace(go.Scatter(x=train_recall_all, y=train_precision_all, name="Train"), row=i+1, col=1) # use enumerated value i to align figures vertically
@@ -243,21 +247,21 @@ if df is not None:
         if 'eval_button_clicked' in st.session_state and st.session_state['eval_button_clicked']:
             st.markdown('## Review Classification Model Performance')
 
-            plot_options = ['ROC Curve', 'Metric Results']
+            plot_options = ['Precision/Recall Curve', 'Metric Results']
 
             review_plot = st.multiselect(
                 label='Select plot option(s)',
                 options=plot_options
             )
             ############## Task 10: Compute evaluation metrics
-            if 'ROC Curve' in review_plot:
+            if 'Precision/Recall Curve' in review_plot:
                 trained_select = [st.session_state[model]
                                   for model in model_select]
-                fig, df = plot_roc_curve(
+                fig, df = plot_pr_curve(
                     X_train, X_val, y_train, y_val, trained_select, model_select)
                 st.plotly_chart(fig)
 
-            ############## Task 11: Plot ROC Curves
+            ############## Task 11: Plot PR Curves
             if 'Metric Results' in review_plot:
                 models = [st.session_state[model]
                           for model in model_select]
@@ -286,16 +290,5 @@ if df is not None:
 
                     st.markdown('### Predictions on the validation dataset')
                     st.dataframe(val_result_dict)
-
-    # Select a model to deploy from the trained models
-    st.markdown("## Choose your Deployment Model")
-    model_select = st.selectbox(
-        label='Select the model you want to deploy',
-        options=st.session_state['trained_models'],
-    )
-
-    if (model_select):
-        st.write('You selected the model: {}'.format(model_select))
-        st.session_state['deploy_model'] = st.session_state[model_select]
 
     st.write('Continue to Deploy Model')
