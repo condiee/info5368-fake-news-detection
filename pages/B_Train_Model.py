@@ -187,60 +187,60 @@ def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
     # 5. Return the trained model
     return nb_model
 
-def train_svm(X_train, y_train, model_name, params, random_state=42):
+# def train_svm(X_train, y_train, model_name, params, random_state=42):
     
-    svm_model = None
-    # Add code here
-    # 1. Create a try and except block to train a logistic regression model.
-    try:
-        # 2. Create a LogisticRegression class object using the random_state as input.
-        svm_model = SVC(random_state=random_state, kernal=params['kernal'], 
-                                      C=params['C'])
+#     svm_model = None
+#     # Add code here
+#     # 1. Create a try and except block to train a logistic regression model.
+#     try:
+#         # 2. Create a LogisticRegression class object using the random_state as input.
+#         svm_model = SVC(random_state=random_state, kernal=params['kernal'], 
+#                                       C=params['C'])
 
-        # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
-        # Remember to create a continuous y_train array using np.ravel() function.
-        svm_model.fit(X_train, y_train)
+#         # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
+#         # Remember to create a continuous y_train array using np.ravel() function.
+#         svm_model.fit(X_train, y_train)
     
-        # 4. Save the model in st.session_state[model_name].
-        st.session_state[model_name] = svm_model
+#         # 4. Save the model in st.session_state[model_name].
+#         st.session_state[model_name] = svm_model
 
-    except:
-        print('Exception thrown; cannot train random forest model')
+#     except:
+#         print('Exception thrown; cannot train random forest model')
 
-    # 5. Return the trained model
-    return svm_model
+#     # 5. Return the trained model
+#     return svm_model
 
-def train_CNN(X_train, y_train, X_test, y_test, model_name, params, random_state=42):
+# def train_CNN(X_train, y_train, X_test, y_test, model_name, params, random_state=42):
     
-    cnn_model = None
-    # Add code here
-    # 1. Create a try and except block to train a logistic regression model.
-    try:
-        # 2. Create a LogisticRegression class object using the random_state as input.
-        cnn_model = keras.Sequential([
-            keras.layers.Conv2D(filters=32, kernel_size=(3,3), activation='relu', input_shape=(28,28,1)),
-            keras.layers.MaxPooling2D(pool_size=(2,2)),
-            keras.layers.Conv2D(filters=64, kernel_size=(3,3), activation='relu'),
-            keras.layers.MaxPooling2D(pool_size=(2,2)),
-            keras.layers.Flatten(),
-            keras.layers.Dense(units=128, activation='relu'),
-            keras.layers.Dense(units=10, activation='softmax')])
+#     cnn_model = None
+#     # Add code here
+#     # 1. Create a try and except block to train a logistic regression model.
+#     try:
+#         # 2. Create a LogisticRegression class object using the random_state as input.
+#         cnn_model = keras.Sequential([
+#             keras.layers.Conv2D(filters=32, kernel_size=(3,3), activation='relu', input_shape=(28,28,1)),
+#             keras.layers.MaxPooling2D(pool_size=(2,2)),
+#             keras.layers.Conv2D(filters=64, kernel_size=(3,3), activation='relu'),
+#             keras.layers.MaxPooling2D(pool_size=(2,2)),
+#             keras.layers.Flatten(),
+#             keras.layers.Dense(units=128, activation='relu'),
+#             keras.layers.Dense(units=10, activation='softmax')])
         
-        cnn_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+#         cnn_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
 
-        # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
-        # Remember to create a continuous y_train array using np.ravel() function.
-        cnn_model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test,y_test))
+#         # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
+#         # Remember to create a continuous y_train array using np.ravel() function.
+#         cnn_model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test,y_test))
     
-        # 4. Save the model in st.session_state[model_name].
-        st.session_state[model_name] = cnn_model
+#         # 4. Save the model in st.session_state[model_name].
+#         st.session_state[model_name] = cnn_model
 
-    except:
-        print('Exception thrown; cannot train random forest model')
+#     except:
+#         print('Exception thrown; cannot train random forest model')
 
-    # 5. Return the trained model
-    return cnn_model
+#     # 5. Return the trained model
+#     return cnn_model
 
 
 # Checkpoint 8
@@ -357,7 +357,10 @@ if df is not None:
 
     classification_methods_options = ['Logistic Regression',
                                       'Stochastic Gradient Descent with Logistic Regression',
-                                      'Stochastic Gradient Descent with Cross Validation']
+                                      'Stochastic Gradient Descent with Cross Validation',
+                                      'Random Forest', 
+                                      'SVM', 
+                                      'Naïve Bayes']
 
     trained_models = [
         model for model in classification_methods_options if model in st.session_state]
