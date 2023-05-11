@@ -16,11 +16,6 @@ st.markdown("# Practical Applications of Machine Learning (PAML)")
 
 #############################################
 
-st.markdown(
-    "### Homework 3 - Predicting Product Review Sentiment Using Classification")
-
-#############################################
-
 st.title('Train Model')
 
 #############################################

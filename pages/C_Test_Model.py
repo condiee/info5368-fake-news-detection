@@ -5,18 +5,13 @@ import random
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from helper_functions import compute_f1, fetch_dataset, compute_precision, compute_recall, compute_accuracy, apply_threshold
-from sklearn.metrics import recall_score, precision_score
+from sklearn.metrics import recall_score, precision_score, roc_curve, roc_auc_score
 from pages.B_Train_Model import split_dataset
 
 random.seed(10)
 #############################################
 
 st.markdown("# Practical Applications of Machine Learning (PAML)")
-
-#############################################
-
-st.markdown(
-    "### Homework 3 - Predicting Product Review Sentiment Using Classification")
 
 #############################################
 
@@ -163,6 +158,54 @@ def plot_pr_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
 
     return fig, df
 
+def plot_roc_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
+    """
+    Plot the ROC curve between predicted and actual values for model names in trained_models on the training and validation datasets
+
+    Input:
+        - X_train: training input data
+        - X_val: test input data
+        - y_true: true targets
+        - y_pred: predicted targets
+        - model_names: trained model names
+        - trained_models: trained models in a dictionary (accessed with model name)
+    Output:
+        - fig: the plotted figure
+    """
+    # Set up figures
+    fig = make_subplots(rows=len(trained_models), cols=1, shared_xaxes=True, vertical_spacing=0.15,
+                         subplot_titles=model_names)
+
+    # Intialize variables
+    df = pd.DataFrame()
+    threshold_values = np.linspace(0.5, 1, num=100) # 100 threshold values
+
+    # Add code here
+    for i, model in enumerate(trained_models):
+    # 1. Use the trained model in trained_models[model_name] to:
+        # i. Make predictions on the train set using predict_proba() function
+        train_probabilities = model.predict_proba(X_train)[::,1]
+        # st.write('train',train_probabilities)
+        # ii. Make predictions on the validation set using predict_proba() function
+        val_probabilities = model.predict_proba(X_val)[::,1]
+        # st.write('val', max(val_probabilities), min(val_probabilities))
+
+        st.write(len(train_probabilities), len(y_val))
+
+        train_fpr, train_tpr, _ = roc_curve(y_val, train_probabilities, pos_label=1)
+        train_auc = roc_auc_score(y_val, train_probabilities)
+
+        val_fpr, val_tpr, _ = roc_curve(y_val,  val_probabilities)
+        val_auc = roc_auc_score(y_val, val_probabilities)
+
+        # 2. Plot the ROC Curve showing the results on training and validation sets
+        fig.add_trace(go.Scatter(x=train_fpr, y=train_tpr, name="Train"), row=i+1, col=1) # use enumerated value i to align figures vertically
+        fig.add_trace(go.Scatter(x=val_fpr, y=val_tpr, name="Validation"),row=i+1, col=1) # use enumerated value i
+        fig.update_xaxes(title_text="False Positive Rate")
+        fig.update_yaxes(title_text='True Positive Rate', row=i+1, col=1) # use enumerated value i
+        fig.update_layout(title='ROC Curve', height=600)
+
+    return fig, df
 
 # Page C
 def restore_data_splits(df):
@@ -247,7 +290,7 @@ if df is not None:
         if 'eval_button_clicked' in st.session_state and st.session_state['eval_button_clicked']:
             st.markdown('## Review Classification Model Performance')
 
-            plot_options = ['Precision/Recall Curve', 'Metric Results']
+            plot_options = ['Precision/Recall Curve', 'ROC Curve', 'Metric Results']
 
             review_plot = st.multiselect(
                 label='Select plot option(s)',
@@ -258,6 +301,13 @@ if df is not None:
                 trained_select = [st.session_state[model]
                                   for model in model_select]
                 fig, df = plot_pr_curve(
+                    X_train, X_val, y_train, y_val, trained_select, model_select)
+                st.plotly_chart(fig)
+
+            if 'ROC Curve' in review_plot:
+                trained_select = [st.session_state[model]
+                                  for model in model_select]
+                fig, df = plot_roc_curve(
                     X_train, X_val, y_train, y_val, trained_select, model_select)
                 st.plotly_chart(fig)
 
