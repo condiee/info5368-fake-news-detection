@@ -1,7 +1,7 @@
 import numpy as np                      # pip install numpy
 import pandas as pd                     # pip install pandas
 import streamlit as st                  # pip install streamlit
-from sklearn.metrics import recall_score, precision_score, accuracy_score
+from sklearn.metrics import recall_score, precision_score, accuracy_score, f1_score
 import re
 
 import string
@@ -239,6 +239,20 @@ def compute_accuracy(y_true, y_pred):
     accuracy = -1
     accuracy = accuracy_score(y_true, y_pred)
     return accuracy
+
+def compute_f1(y_true, y_pred):
+    """
+    Computes the F1 score
+
+    Input:
+        - y_true: true targets
+        - y_pred: predicted targets
+    Output:
+        - F1 score
+    """
+    f1 = -1
+    f1 = f1_score(y_true, y_pred)
+    return f1
 
 # Page B
 # TODO: won't work if negative_upper_bound==5 --> only has negative y
