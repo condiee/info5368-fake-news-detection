@@ -148,23 +148,26 @@ def summarize_review_data(df, reviews_col, top_n=3):
 
     out_dict['total_num_words'] = total_words
     out_dict['average_word_count'] = total_words / len(df)
+
+    # Display summary
+    st.write(f'Showing Stats for **{reviews_col}** column:')
+    # st.write('##### Total number of words')
+    st.write('**Total number of words:** {}'.format(out_dict['total_num_words']))
+
+    # st.write('##### Average word count')
+    st.write('**Average word count:** {}'.format(out_dict['average_word_count']))
+
+    # select top_n
+    top_n = st.number_input("Select # articles to show with the most and least words:", min_value=1, max_value=len(df)-1, value=top_n)
     out_dict['top_n_reviews_most_words'] = df.nlargest(
         top_n, 'Number of Words')#[['reviews']]
     out_dict['top_n_reviews_least_words'] = df.nsmallest(
         top_n, 'Number of Words')#[['reviews']]
-    
-    # Display summary
-    st.write(f'### Showing Stats for {reviews_col}')
-    st.write('#### Total number of words')
-    st.write('Total number of words: {}'.format(out_dict['total_num_words']))
 
-    st.write('#### Average word count')
-    st.write('Average word count: {}'.format(out_dict['average_word_count']))
-
-    st.write(f'#### {top_n} articles with most words')
+    st.write(f'**Top {top_n} articles with most words:**')
     st.dataframe(out_dict['top_n_reviews_most_words'])
 
-    st.write(f'#### {top_n} articles with least words:')
+    st.write(f'**Top {top_n} articles with least words:**')
     st.dataframe(out_dict['top_n_reviews_least_words'])
 
     return out_dict

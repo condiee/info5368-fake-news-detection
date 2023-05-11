@@ -197,10 +197,10 @@ if df is not None:
             st.markdown('Cleaned Dataset')
             st.dataframe(df)
 
-    st.markdown('### Visualize Features')
+    st.markdown('## Visualize Features')
 
     ############## World Cloud
-    st.markdown('## Word Cloud')
+    st.markdown('### Word Cloud')
     st.markdown('Select subject to create word cloud')
     article_subjects = list(set(df.subject.values))
     article_subjects.append('all')
@@ -216,7 +216,7 @@ if df is not None:
                 t = df.loc[df['subject'] == x]
                 generate_word_cloud(t.text.values)
     
-    st.markdown('## Feature Graphs')
+    st.markdown('### Feature Graphs')
     st.markdown('Select feature to view graphically')
     graph_sub = ['label', 'subject']
     graph_feature = st.multiselect(
