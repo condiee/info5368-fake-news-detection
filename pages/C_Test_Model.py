@@ -4,7 +4,7 @@ import streamlit as st                  # pip install streamlit
 import random
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from helper_functions import fetch_dataset, compute_precision, compute_recall, compute_accuracy, apply_threshold
+from helper_functions import compute_f1, fetch_dataset, compute_precision, compute_recall, compute_accuracy, apply_threshold
 from sklearn.metrics import recall_score, precision_score
 from pages.B_Train_Model import split_dataset
 
@@ -28,13 +28,14 @@ st.title('Test Model')
 METRICS_MAP = {
     'precision': compute_precision,
     'recall': compute_recall,
-    'accuracy': compute_accuracy
+    'accuracy': compute_accuracy,
+    'f1': compute_f1
 }
 
 # Checkpoint 9
 def compute_eval_metrics(X, y_true, model, metrics):
     """
-    This function computes one or more metrics (precision, recall, accuracy) using the model
+    This function computes one or more metrics (precision, recall, accuracy, f1 score) using the model
 
     Input:
         - X: pandas dataframe with training features
@@ -62,6 +63,9 @@ def compute_eval_metrics(X, y_true, model, metrics):
         elif metric == 'accuracy':
             # result = np.sum(pred == y_true.to_numpy().reshape(-1)) / len(X)
             result = compute_accuracy(y_true, pred)
+        elif metric == 'f1 score':
+            # result = np.sum(pred == y_true.to_numpy().reshape(-1)) / len(X)
+            result = compute_f1(y_true, pred)
         
         # b. Store the result in out_dict[metric_name]
         metric_dict[metric] = result
