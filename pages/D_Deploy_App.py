@@ -4,10 +4,11 @@ import string
 #############################################
 
 st.markdown("# Practical Applications of Machine Learning (PAML)")
+st.markdown("## Real or Fake News?")
 
 #############################################
 
-st.markdown("### Homework 3 - Predicting Product Review Sentiment Using Classification")
+st.markdown("On this page, you can use one of the models you have trained to predict whether a news article is real or fake news. You can also detect the sentiment of the article.")
 
 #############################################
 
@@ -26,7 +27,7 @@ def deploy_model(text):
     Output: 
         - product_sentiment: product sentiment class, +1 or -1
     """
-    product_sentiment=None
+    product_sentiment = None
 
     # Add code here
     # 1. Restore the model for deployment in st.session_state[‘deploy_model’]
@@ -43,7 +44,7 @@ df = None
 if 'data' in st.session_state:
     df = st.session_state['data']
 else:
-    st.write('### The Product Review Sentiment Application is under construction. Coming to you soon.')
+    st.write('#### Please upload a dataset on page A to train a model before deployment.')
 
 # Deploy App!
 if df is not None:
