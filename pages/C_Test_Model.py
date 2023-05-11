@@ -265,11 +265,14 @@ if df is not None:
     X_train, X_val, y_train, y_val = restore_data_splits(df)
 
     st.markdown("## Get Performance Metrics")
-    metric_options = ['precision', 'recall', 'accuracy']
+    metric_options = ['precision', 'recall', 'accuracy', 'f1']
 
     classification_methods_options = ['Logistic Regression',
                                       'Stochastic Gradient Descent with Logistic Regression',
-                                      'Stochastic Gradient Descent with Cross Validation']
+                                      'Stochastic Gradient Descent with Cross Validation',
+                                      'Random Forest', 
+                                      'SVM', 
+                                      'Naïve Bayes']
 
     trained_models = [
         model for model in classification_methods_options if model in st.session_state]
