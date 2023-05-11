@@ -191,11 +191,11 @@ if df is not None:
     st.dataframe(df)
 
     # Remove irrelevant features
-    df, data_cleaned = clean_data(df)
-    if (data_cleaned):
-        # st.markdown('The dataset has been cleaned. Your welcome!')
-        st.markdown('Cleaned Dataset')
-        st.dataframe(df)
+    if st.button('Clean Dataset'):
+        df, data_cleaned = clean_data(df)
+        if (data_cleaned):
+            st.markdown('Cleaned Dataset')
+            st.dataframe(df)
 
     st.markdown('### Visualize Features')
 
@@ -230,19 +230,6 @@ if df is not None:
             elif x == 'subject':
                 st.bar_chart(df.subject.value_counts())
 
-    
-
-    ############## Task 1: Remove Punctation
-    st.markdown('### Remove punctuation from features')
-    removed_p_features = st.multiselect(
-        'Select features to remove punctuation',
-        df.columns,
-    )
-    if (removed_p_features):
-        df = remove_punctuation(df, removed_p_features)
-        # Display updated dataframe
-        st.dataframe(df)
-        st.write('Punctuation was removed from {}'.format(removed_p_features))
 
     # Summarize reviews
     st.markdown('### Describe Data')
