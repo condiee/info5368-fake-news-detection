@@ -287,15 +287,4 @@ if df is not None:
                     st.markdown('### Predictions on the validation dataset')
                     st.dataframe(val_result_dict)
 
-    # Select a model to deploy from the trained models
-    st.markdown("## Choose your Deployment Model")
-    model_select = st.selectbox(
-        label='Select the model you want to deploy',
-        options=st.session_state['trained_models'],
-    )
-
-    if (model_select):
-        st.write('You selected the model: {}'.format(model_select))
-        st.session_state['deploy_model'] = st.session_state[model_select]
-
     st.write('Continue to Deploy Model')
