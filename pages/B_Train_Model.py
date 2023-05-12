@@ -82,39 +82,39 @@ def split_dataset(df, number, target, feature_encoding, random_state=42):
 
     return X_train_sentiment, X_val_sentiment, y_train, y_val
 
-# def train_logistic_regression(X_train, y_train, model_name, params, random_state=42):
-#     """
-#     This function trains the model with logistic regression and stores it in st.session_state[model_name].
+def train_logistic_regression(X_train, y_train, model_name, params, random_state=42):
+    """
+     This function trains the model with logistic regression and stores it in st.session_state[model_name].
 
-#     Input:
-#         - X_train: training features (review features)
-#         - y_train: training targets
-#         - model_name: (string) model name
-#         - params: a dictionary with lg hyperparameters: max_iter, solver, tol, and penalty
-#         - random_state: determines random number generation for centroid initialization
-#     Output:
-#         - lg_model: the trained model
-#     """
-#     lg_model = None
-#     # Add code here
+     Input:
+         - X_train: training features (review features)
+         - y_train: training targets
+         - model_name: (string) model name
+         - params: a dictionary with lg hyperparameters: max_iter, solver, tol, and penalty
+         - random_state: determines random number generation for centroid initialization
+     Output:
+         - lg_model: the trained model
+    """
+    lg_model = None
+     #     # Add code here
 #     # 1. Create a try and except block to train a logistic regression model.
-#     try:
+    try:
 #         # 2. Create a LogisticRegression class object using the random_state as input.
-#         lg_model = LogisticRegression(random_state=random_state, max_iter=params['max_iter'], 
-#                                       solver=params['solver'], tol=params['tol'], penalty=params['penalty'])
+        lg_model = LogisticRegression(random_state=random_state, max_iter=params['max_iter'], 
+                                       solver=params['solver'], tol=params['tol'], penalty=params['penalty'])
 
 #             # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
 #             # Remember to create a continuous y_train array using np.ravel() function.
-#         lg_model.fit(X_train, np.ravel(y_train))
+        lg_model.fit(X_train, np.ravel(y_train))
     
 #         # 4. Save the model in st.session_state[model_name].
-#         st.session_state[model_name] = lg_model
+        st.session_state[model_name] = lg_model
 
-#     except:
-#         print('Exception thrown; cannot train logit model')
+    except Exception as e:
+        print('Exception thrown; cannot train logit model', e)
 
 #     # 5. Return the trained model
-#     return lg_model
+    return lg_model
 
 # logistic regression, random forest, SVM, naive bayes
 
@@ -143,7 +143,7 @@ def train_grid_random_forest(X_train, y_train, model_name):
         rf = RandomForestClassifier()
         param_grid = {'n_estimators' : [50,100,150,200], 'max_depth' : [10,20,30,40,50]}
         rf_model = GridSearchCV(rf, param_grid, cv=5)
-        rf_model.fit(X_train, y_train)
+        rf_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = rf_model
     except Exception as e:
         print('Exception thrown; cannot train random forest model. ERROR:', e)
@@ -179,7 +179,7 @@ def train_grid_svm(X_train, y_train, model_name):
         ## changed to e here
         param_grid = {'kernel' : ['linear', 'poly', 'rbf', 'sigmoid'], 'C' : [0.001, 0.01, 0.1, 1, 10, 100]}        
         svm_model = GridSearchCV(svm, param_grid, cv=5)
-        svm_model.fit(X_train, y_train)
+        svm_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = svm_model
     except Exception as e:
         print('Exception thrown; cannot train svm model. ERROR:', e)
@@ -192,7 +192,7 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
     # Add code here
     try:
         ## changed to e here
-        svm_model = SVC(random_state=random_state, kernel=params['kernal'], 
+        svm_model = SVC(random_state=random_state, kernel=params['kernel'], 
                                       C=params['C'])
 
             # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
@@ -214,7 +214,7 @@ def train_grid_naive_bayes(X_train, y_train, model_name):
         nb = GaussianNB()
         param_grid = {'var_smoothing' : [1e-9, 1e-8, 1e-7, 1e-6, 1e-5]}       
         nb_model = GridSearchCV(nb, param_grid, cv=5)
-        nb_model.fit(X_train, y_train)
+        nb_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = nb_model
     except Exception as e:
         print('Exception thrown; cannot train naive bayes model. ERROR:', e)
@@ -370,57 +370,57 @@ if df is not None:
         if st.button('Train Logistic Regression'): # with Grid Search Cross Validation for Best Parameters
             train_grid_logistic_regression(
                 X_train, y_train, classification_methods_options[0])
-        # else:
-        #     lg_col1, lg_col2 = st.columns(2)
-        #     with (lg_col1):
-        #         # solver: algorithm to use in the optimization problem
-        #         solvers = ['liblinear', 'newton-cg', 'lbfgs', 'sag', 'saga']
-        #         lg_solvers = st.selectbox(
-        #         label='Select solvers',
-        #         options=solvers,
-        #         key='lg_reg_solver_multiselect'
-        #         )
-        #         st.write('You select the following solver(s): {}'.format(lg_solvers))
+        else:
+            lg_col1, lg_col2 = st.columns(2)
+            with (lg_col1):
+                 # solver: algorithm to use in the optimization problem
+                 solvers = ['liblinear', 'newton-cg', 'lbfgs', 'sag', 'saga']
+                 lg_solvers = st.selectbox(
+                 label='Select solvers',
+                 options=solvers,
+                 key='lg_reg_solver_multiselect'
+                 )
+                 st.write('You select the following solver(s): {}'.format(lg_solvers))
 
         #         # penalty: 'l1' or 'l2' regularization
-        #         lg_penalty_select = st.selectbox(
-        #         label='Select penalty',
-        #         options=['l2', 'l1'],
-        #         key='lg_penalty_multiselect'
-        #         )
-        #         st.write('You select the following penalty: {}'.format(
-        #         lg_penalty_select))
+                 lg_penalty_select = st.selectbox(
+                 label='Select penalty',
+                 options=['l2', 'l1'],
+                 key='lg_penalty_multiselect'
+                 )
+                 st.write('You select the following penalty: {}'.format(
+                 lg_penalty_select))
 
-        #     with (lg_col2):
-        #         # tolerance: stopping criteria for iterations
-        #         lg_tol = st.text_input(
-        #         label='Input a tolerance value',
-        #         value='0.01',
-        #         key='lg_tol_textinput'
-        #         )
-        #         lg_tol = float(lg_tol)
-        #         st.write('You select the following tolerance value: {}'.format(lg_tol))
+            with (lg_col2):
+                 # tolerance: stopping criteria for iterations
+                 lg_tol = st.text_input(
+                 label='Input a tolerance value',
+                 value='0.01',
+                 key='lg_tol_textinput'
+                 )
+                 lg_tol = float(lg_tol)
+                 st.write('You select the following tolerance value: {}'.format(lg_tol))
 
-        #         # max_iter: maximum iterations to run the LG until convergence
-        #         lg_max_iter = st.number_input(
-        #         label='Enter the number of maximum iterations on training data',
-        #         min_value=1000,
-        #         max_value=5000,
-        #         value=1000,
-        #         step=100,
-        #         key='lg_max_iter_numberinput'
-        #         )
-        #         st.write('You set the maximum iterations to: {}'.format(lg_max_iter))
+                 # max_iter: maximum iterations to run the LG until convergence
+                 lg_max_iter = st.number_input(
+                 label='Enter the number of maximum iterations on training data',
+                 min_value=1000,
+                 max_value=5000,
+                 value=1000,
+                 step=100,
+                 key='lg_max_iter_numberinput'
+                 )
+                 st.write('You set the maximum iterations to: {}'.format(lg_max_iter))
 
-        #     lg_params = {
-        #     'max_iter': lg_max_iter,
-        #     'penalty': lg_penalty_select,
-        #     'tol': lg_tol,
-        #     'solver': lg_solvers,
-        #     }
-        #     if st.button('Train Logistic Regression Model'):
-        #         train_logistic_regression(
-        #         X_train, y_train, classification_methods_options[0], lg_params)
+            lg_params = {
+             'max_iter': lg_max_iter,
+             'penalty': lg_penalty_select,
+             'tol': lg_tol,
+             'solver': lg_solvers,
+             }
+            if st.button('Train Logistic Regression Model'):
+                train_logistic_regression(
+                X_train, y_train, classification_methods_options[0], lg_params)
 
         if classification_methods_options[0] not in st.session_state:
             st.write('Logistic Regression Model is untrained')
@@ -490,17 +490,17 @@ if df is not None:
                 )
                 st.write('You set c to: {}'.format(c))
             with (svm_col2):
-                kernal = st.selectbox(
-                label='Select kernal for SVM',
+                kernel = st.selectbox(
+                label='Select kernel for SVM',
                 options=['linear', 'poly', 'rbf', 'sigmoid'],
                 key='svm_kernal_multiselect'
                 )
-                st.write('You set the kernal to: {}'.format(kernal))
+                st.write('You set the kernel to: {}'.format(kernel))
 
             svm_params = {
             'C': c,
             ### changing to e here
-            'kernel': kernal,
+            'kernel': kernel,
             }
             if st.button('Train SVM Model'):
                 train_svm(
