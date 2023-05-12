@@ -226,8 +226,10 @@ if df is not None:
     if (graph_feature):
         for x in graph_feature:
             if x == 'label':
+                st.write("### Real (0) and Fake(1) News Articles in the Dataset")
                 st.bar_chart(df.label.value_counts())
             elif x == 'subject':
+                st.write("### Article Subjects in the Dataset")
                 st.bar_chart(df.subject.value_counts())
 
 
