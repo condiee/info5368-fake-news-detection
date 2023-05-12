@@ -24,10 +24,15 @@ def deploy_model(text):
         - product_sentiment: product sentiment class, +1 or -1
     """
     product_sentiment = None
+    model = None
 
     # Add code here
     # 1. Restore the model for deployment in st.session_state[‘deploy_model’]
-    model = st.session_state['deploy_model']
+    if('deploy_model' in st.session_state):
+        model = st.session_state['deploy_model']
+        
+    if(model):
+        product_sentiment = model.predict(text)
 
     # 2. Predict the product sentiment of the input text using the predict function e.g.,
     product_sentiment = model.predict(text)

@@ -232,7 +232,6 @@ if df is not None:
                 st.write("### Article Subjects in the Dataset")
                 st.bar_chart(df.subject.value_counts())
 
-
     # Summarize reviews
     st.markdown('### Describe Data')
     object_columns = df.select_dtypes(include=['object']).columns

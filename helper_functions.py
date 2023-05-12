@@ -206,7 +206,7 @@ def compute_precision(y_true, y_pred):
     Output:
         - precision score
     """
-    precision = -1
+    # precision = -1
     precision = precision_score(y_true, y_pred)
     return precision
 
@@ -221,7 +221,7 @@ def compute_recall(y_true, y_pred):
     Output:
         - recall score
     """
-    recall = -1
+    # recall = -1
     recall = recall_score(y_true, y_pred)
     return recall
 
@@ -236,7 +236,7 @@ def compute_accuracy(y_true, y_pred):
     Output:
         - accuracy score
     """
-    accuracy = -1
+    # accuracy = -1
     accuracy = accuracy_score(y_true, y_pred)
     return accuracy
 
@@ -250,7 +250,7 @@ def compute_f1(y_true, y_pred):
     Output:
         - F1 score
     """
-    f1 = -1
+    # F1 = 2 * (precision * recall) / (precision + recall)
     f1 = f1_score(y_true, y_pred)
     return f1
 
