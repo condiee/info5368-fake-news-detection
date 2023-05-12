@@ -1,12 +1,11 @@
 import numpy as np                      # pip install numpy
 from sklearn.model_selection import train_test_split
 import streamlit as st                  # pip install streamlit
-from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
-#from tensorflow import keras
 import random
 from helper_functions import fetch_dataset, set_pos_neg_reviews
 random.seed(10)
@@ -83,56 +82,57 @@ def split_dataset(df, number, target, feature_encoding, random_state=42):
 
     return X_train_sentiment, X_val_sentiment, y_train, y_val
 
-#logistic regression, random forest, SVM, naive bayes, CNN
+# def train_logistic_regression(X_train, y_train, model_name, params, random_state=42):
+#     """
+#     This function trains the model with logistic regression and stores it in st.session_state[model_name].
 
-# Checkpoint 5
+#     Input:
+#         - X_train: training features (review features)
+#         - y_train: training targets
+#         - model_name: (string) model name
+#         - params: a dictionary with lg hyperparameters: max_iter, solver, tol, and penalty
+#         - random_state: determines random number generation for centroid initialization
+#     Output:
+#         - lg_model: the trained model
+#     """
+#     lg_model = None
+#     # Add code here
+#     # 1. Create a try and except block to train a logistic regression model.
+#     try:
+#         # 2. Create a LogisticRegression class object using the random_state as input.
+#         lg_model = LogisticRegression(random_state=random_state, max_iter=params['max_iter'], 
+#                                       solver=params['solver'], tol=params['tol'], penalty=params['penalty'])
+
+#             # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
+#             # Remember to create a continuous y_train array using np.ravel() function.
+#         lg_model.fit(X_train, np.ravel(y_train))
+    
+#         # 4. Save the model in st.session_state[model_name].
+#         st.session_state[model_name] = lg_model
+
+#     except:
+#         print('Exception thrown; cannot train logit model')
+
+#     # 5. Return the trained model
+#     return lg_model
+
+# logistic regression, random forest, SVM, naive bayes
+
 def train_grid_logistic_regression(X_train, y_train, model_name):
     lg = None
     try:
         lg = LogisticRegression()
-        param_grid = {'solver' : ['liblinear', 'lbfgs', 'newton-cg',
-                       'newton-cholesky', 'sag', 'saga'], 'penalty': ['l1', 'l2'], 'tol' : [0.0001, 
-                       0.001, 0.01,0.1 ], 'max_iter' : [1000, 2000, 3000, 4000, 5000]}
-        lg_model = GridSearchCV(lg, param_grid, cv=5)
+        param_grid = {'solver' : ['liblinear', 'saga'], # 'lbfgs', 'sag', 
+                       'penalty': ['l1', 'l2'],
+                        'tol' : [0.0001, 0.001, 0.01,0.1 ], 
+                        'max_iter' : [1000, 3000, 5000]}
+        lg_model = GridSearchCV(lg, param_grid, cv=10)
         lg_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = lg_model
-    except:
-        print('Exception thrown; cannot train logit model')
-
-    # 5. Return the trained model
-    return lg_model
-
-
-def train_logistic_regression(X_train, y_train, model_name, params, random_state=42):
-    """
-    This function trains the model with logistic regression and stores it in st.session_state[model_name].
-
-    Input:
-        - X_train: training features (review features)
-        - y_train: training targets
-        - model_name: (string) model name
-        - params: a dictionary with lg hyperparameters: max_iter, solver, tol, and penalty
-        - random_state: determines random number generation for centroid initialization
-    Output:
-        - lg_model: the trained model
-    """
-    lg_model = None
-    # Add code here
-    # 1. Create a try and except block to train a logistic regression model.
-    try:
-        # 2. Create a LogisticRegression class object using the random_state as input.
-        lg_model = LogisticRegression(random_state=random_state, max_iter=params['max_iter'], 
-                                      solver=params['solver'], tol=params['tol'], penalty=params['penalty'])
-
-            # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
-            # Remember to create a continuous y_train array using np.ravel() function.
-        lg_model.fit(X_train, np.ravel(y_train))
-    
-        # 4. Save the model in st.session_state[model_name].
-        st.session_state[model_name] = lg_model
-
-    except:
-        print('Exception thrown; cannot train logit model')
+        st.write("tuned hpyerparameters: (best parameters) ",lg_model.best_params_)
+        st.write("accuracy :",lg_model.best_score_)
+    except Exception as e:
+        print('Exception thrown; cannot train logit model. ERROR:', e)
 
     # 5. Return the trained model
     return lg_model
@@ -145,8 +145,8 @@ def train_grid_random_forest(X_train, y_train, model_name):
         rf_model = GridSearchCV(rf, param_grid, cv=5)
         rf_model.fit(X_train, y_train)
         st.session_state[model_name] = rf_model
-    except:
-        print('Exception thrown; cannot train random forest model')
+    except Exception as e:
+        print('Exception thrown; cannot train random forest model. ERROR:', e)
 
     # 5. Return the trained model
     return rf_model
@@ -155,9 +155,7 @@ def train_random_forest(X_train, y_train, model_name, params, random_state=42):
 
     rf_model = None
     # Add code here
-    # 1. Create a try and except block to train a logistic regression model.
     try:
-            # 2. Create a LogisticRegression class object using the random_state as input.
         rf_model = RandomForestClassifier(random_state=random_state, n_estimators=params['n_estimators'], 
                                       max_depth=params['max_depth'])
 
@@ -168,8 +166,8 @@ def train_random_forest(X_train, y_train, model_name, params, random_state=42):
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = rf_model
 
-    except:
-        print('Exception thrown; cannot train random forest model')
+    except Exception as e:
+        print('Exception thrown; cannot train random forest model. ERROR:', e)
 
     # 5. Return the trained model
     return rf_model
@@ -182,9 +180,8 @@ def train_grid_svm(X_train, y_train, model_name):
         svm_model = GridSearchCV(svm, param_grid, cv=5)
         svm_model.fit(X_train, y_train)
         st.session_state[model_name] = svm_model
-    except:
-        print('Exception thrown; cannot train svm model')
-
+    except Exception as e:
+        print('Exception thrown; cannot train svm model. ERROR:', e)
     # 5. Return the trained model
     return svm_model
 
@@ -192,9 +189,7 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
     
     svm_model = None
     # Add code here
-    # 1. Create a try and except block to train a logistic regression model.
     try:
-            # 2. Create a LogisticRegression class object using the random_state as input.
         svm_model = SVC(random_state=random_state, kernal=params['kernal'], 
                                       C=params['C'])
 
@@ -205,8 +200,8 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = svm_model
 
-    except:
-        print('Exception thrown; cannot train svm model')
+    except Exception as e:
+        print('Exception thrown; cannot train svm model. ERROR:', e)
 
     # 5. Return the trained model
     return svm_model
@@ -219,8 +214,8 @@ def train_grid_naive_bayes(X_train, y_train, model_name):
         nb_model = GridSearchCV(nb, param_grid, cv=5)
         nb_model.fit(X_train, y_train)
         st.session_state[model_name] = nb_model
-    except:
-        print('Exception thrown; cannot train naive bayes model')
+    except Exception as e:
+        print('Exception thrown; cannot train naive bayes model. ERROR:', e)
 
     # 5. Return the trained model
     return nb_model
@@ -231,7 +226,6 @@ def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
     # Add code here
     # 1. Create a try and except block to train a logistic regression model.
     try:
-            # 2. Create a LogisticRegression class object using the random_state as input.
         nb_model = GaussianNB(var_smoothing=params['var_smoothing'])
 
             # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
@@ -302,17 +296,18 @@ df = fetch_dataset()
 if df is not None:
 
     # Display dataframe as table
+    st.write('### Displaying cleaned and processed data:')
     st.dataframe(df)
 
     # Select variable to predict
-    feature_predict_select = st.selectbox(
-        label='Select variable to predict',
-        index=df.columns.get_loc(
-            'sentiment') if 'sentiment' in df.columns else 0,
-        options=df.columns,
-        key='feature_selectbox',
-    )
-
+    # feature_predict_select = st.selectbox(
+    #     label='Select variable to predict',
+    #     index=df.columns.get_loc(
+    #         'sentiment') if 'sentiment' in df.columns else 0,
+    #     options=df.columns,
+    #     key='feature_selectbox',
+    # )
+    feature_predict_select = 'label'
     st.session_state['target'] = feature_predict_select
 
     word_count_encoder_options = ['Word Count', 'TF-IDF']
@@ -331,6 +326,7 @@ if df is not None:
 
     st.session_state['feature'] = feature_input_select
 
+    # TODO: fix this so it isn't misleading what you're training on (article text!)
     st.write('You selected input {} and output {}'.format(
         feature_input_select, feature_predict_select))
 
@@ -369,61 +365,60 @@ if df is not None:
     if (classification_methods_options[0] in classification_model_select or classification_methods_options[0] in trained_models):
         st.markdown('#### ' + classification_methods_options[0])
 
-        if st.button('Train Logistic Regression with Grid Search Best Parameters'):
+        if st.button('Train Logistic Regression'): # with Grid Search Cross Validation for Best Parameters
             train_grid_logistic_regression(
                 X_train, y_train, classification_methods_options[0])
-        else:
-            lg_col1, lg_col2 = st.columns(2)
-            with (lg_col1):
-                # solver: algorithm to use in the optimization problem
-                solvers = ['liblinear', 'lbfgs', 'newton-cg',
-                       'newton-cholesky', 'sag', 'saga']
-                lg_solvers = st.selectbox(
-                label='Select solvers for SGD',
-                options=solvers,
-                key='lg_reg_solver_multiselect'
-                )
-                st.write('You select the following solver(s): {}'.format(lg_solvers))
+        # else:
+        #     lg_col1, lg_col2 = st.columns(2)
+        #     with (lg_col1):
+        #         # solver: algorithm to use in the optimization problem
+        #         solvers = ['liblinear', 'newton-cg', 'lbfgs', 'sag', 'saga']
+        #         lg_solvers = st.selectbox(
+        #         label='Select solvers',
+        #         options=solvers,
+        #         key='lg_reg_solver_multiselect'
+        #         )
+        #         st.write('You select the following solver(s): {}'.format(lg_solvers))
 
-                # penalty: 'l1' or 'l2' regularization
-                lg_penalty_select = st.selectbox(
-                label='Select penalty for SGD',
-                options=['l2', 'l1'],
-                key='lg_penalty_multiselect'
-                )
-                st.write('You select the following penalty: {}'.format(
-                lg_penalty_select))
+        #         # penalty: 'l1' or 'l2' regularization
+        #         lg_penalty_select = st.selectbox(
+        #         label='Select penalty',
+        #         options=['l2', 'l1'],
+        #         key='lg_penalty_multiselect'
+        #         )
+        #         st.write('You select the following penalty: {}'.format(
+        #         lg_penalty_select))
 
-            with (lg_col2):
-                # tolerance: stopping criteria for iterations
-                lg_tol = st.text_input(
-                label='Input a tolerance value',
-                value='0.01',
-                key='lg_tol_textinput'
-                )
-                lg_tol = float(lg_tol)
-                st.write('You select the following tolerance value: {}'.format(lg_tol))
+        #     with (lg_col2):
+        #         # tolerance: stopping criteria for iterations
+        #         lg_tol = st.text_input(
+        #         label='Input a tolerance value',
+        #         value='0.01',
+        #         key='lg_tol_textinput'
+        #         )
+        #         lg_tol = float(lg_tol)
+        #         st.write('You select the following tolerance value: {}'.format(lg_tol))
 
-                # max_iter: maximum iterations to run the LG until convergence
-                lg_max_iter = st.number_input(
-                label='Enter the number of maximum iterations on training data',
-                min_value=1000,
-                max_value=5000,
-                value=1000,
-                step=100,
-                key='lg_max_iter_numberinput'
-                )
-                st.write('You set the maximum iterations to: {}'.format(lg_max_iter))
+        #         # max_iter: maximum iterations to run the LG until convergence
+        #         lg_max_iter = st.number_input(
+        #         label='Enter the number of maximum iterations on training data',
+        #         min_value=1000,
+        #         max_value=5000,
+        #         value=1000,
+        #         step=100,
+        #         key='lg_max_iter_numberinput'
+        #         )
+        #         st.write('You set the maximum iterations to: {}'.format(lg_max_iter))
 
-            lg_params = {
-            'max_iter': lg_max_iter,
-            'penalty': lg_penalty_select,
-            'tol': lg_tol,
-            'solver': lg_solvers,
-            }
-            if st.button('Train Logistic Regression Model'):
-                train_logistic_regression(
-                X_train, y_train, classification_methods_options[0], lg_params)
+        #     lg_params = {
+        #     'max_iter': lg_max_iter,
+        #     'penalty': lg_penalty_select,
+        #     'tol': lg_tol,
+        #     'solver': lg_solvers,
+        #     }
+        #     if st.button('Train Logistic Regression Model'):
+        #         train_logistic_regression(
+        #         X_train, y_train, classification_methods_options[0], lg_params)
 
         if classification_methods_options[0] not in st.session_state:
             st.write('Logistic Regression Model is untrained')
