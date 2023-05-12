@@ -306,44 +306,16 @@ if df is not None:
     # Display dataframe as table
     st.dataframe(df)
 
-    st.markdown('### Do you want to predict whether an article is real or fake news, the article sentiment, or both?')
-    options = ['Real or Fake News', 'Sentiment Analysis']
-    select_options = st.multiselect(
-        'Select what to predict:',
-        options,
-    )
-    if (select_options):
-        for option in select_options:
-            # if option == options[1]: # sentiment analysis
-                #do stuff
-            if option == options[0]: # real/fake news
-                st.session_state['target'] = 'label'
-
-    # if (select_options):
-    #     for option in select_options:
-    #         if option == options[1]: # sentiment analysis
-                # Select positive and negative articles
-                # pos_neg_select = st.slider(
-                #     'Select a range of ratings for negative reviews',
-                #     1, 5, 3,
-                #     key='pos_neg_selectbox')
-
-                # if (pos_neg_select and st.button('Set negative sentiment upper bound')):
-                #     df = set_pos_neg_reviews(df, pos_neg_select)
-
-                #     st.write('You selected ratings positive rating greater than {}'.format(
-                #         pos_neg_select))
-
     # Select variable to predict
-    # feature_predict_select = st.selectbox(
-    #     label='Select variable to predict',
-    #     index=df.columns.get_loc(
-    #         'sentiment') if 'sentiment' in df.columns else 0,
-    #     options=df.columns,
-    #     key='feature_selectbox',
-    # )
+    feature_predict_select = st.selectbox(
+        label='Select variable to predict',
+        index=df.columns.get_loc(
+            'sentiment') if 'sentiment' in df.columns else 0,
+        options=df.columns,
+        key='feature_selectbox',
+    )
 
-    # st.session_state['target'] = feature_predict_select
+    st.session_state['target'] = feature_predict_select
 
     word_count_encoder_options = ['Word Count', 'TF-IDF']
     if ('word_encoder' in st.session_state):
@@ -361,8 +333,8 @@ if df is not None:
 
     st.session_state['feature'] = feature_input_select
 
-    # st.write('You selected input {} and output {}'.format(
-    #     feature_input_select, feature_predict_select))
+    st.write('You selected input {} and output {}'.format(
+        feature_input_select, feature_predict_select))
 
     # Task 4: Split train/test
     st.markdown('## Split dataset into Train/Test sets')
@@ -516,7 +488,7 @@ if df is not None:
                 c = st.number_input(
                 label='Enter the value of C',
                 min_value=0.0001,
-                max_value=100,
+                max_value=100.0,
                 value=0.1,
                 step=0.1,
                 key='svm_c_numberinput'
@@ -555,7 +527,7 @@ if df is not None:
             label='Enter the value of var smoothing',
             min_value=0.0000001,
             max_value=0.1,
-            value=0.001,
+            value=0.1,
             step=0.01,
             key='nb_var_numberinput'
             )
