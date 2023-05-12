@@ -8,7 +8,9 @@ from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 from PIL import Image
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.metrics import confusion_matrix
 from helper_functions import fetch_dataset, clean_data, summarize_review_data, display_review_keyword, remove_review
+
 #############################################
 
 st.markdown("# Practical Applications of Machine Learning (PAML)")
@@ -67,7 +69,7 @@ def word_count_encoder(df, feature, word_encoder):
     """
     # Add code here
     # 1. Use the CountVectorizer() to create a count vectorizer class object.
-    count_vect = CountVectorizer()
+    count_vect = CountVectorizer(max_features = 100)
 
     # for feature in features:
     # st.write(feature)
@@ -114,7 +116,7 @@ def tf_idf_encoder(df, feature, word_encoder):
     """
     # Add code here
     # 1. Use the CountVectorizer() to create a count vectorizer class object.
-    count_vect = CountVectorizer()
+    count_vect = CountVectorizer(max_features = 2000)
 
     # 2. Use the count vectorizer transform() function to the feature in df to create frequency
     # counts for words.

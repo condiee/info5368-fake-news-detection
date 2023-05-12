@@ -6,7 +6,10 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from helper_functions import compute_f1, fetch_dataset, compute_precision, compute_recall, compute_accuracy, apply_threshold
 from sklearn.metrics import recall_score, precision_score, roc_curve, roc_auc_score
+from sklearn import metrics
+from sklearn.metrics import confusion_matrix
 from pages.B_Train_Model import split_dataset
+import matplotlib.pyplot as plt
 
 random.seed(10)
 #############################################
@@ -70,14 +73,20 @@ def compute_eval_metrics(X, y_true, model, metrics):
 
 #confusion matrix
 ## referenced https://www.kaggle.com/code/sahrul/fake-news-detection-using-cnn
-def plot_cmatrix(X, y_true, model, metrics):
-    y_pred = model.predict(X)
-    cmatrix = confusion_matrix(y_true, y_pred)
-    cmatrix - pd.dataFrame(cmatrix, index = [0, 1], columns = [0, 1])
-    cm_cv.index.name = "Actual"
-    cm_cv.columns.name = "Predicted"
-    plt.figure(figsize = (10, 10))
-    sns.heatmap(cmatrix, cmap = "Blues", annot = True, fmt = '')
+def plot_cmatrix(X, y_true, model):
+    pred = model.predict(X)
+    cmatrix = confusion_matrix(y_true, pred)
+    fig, ax = plt.subplots(figsize=(8, 8))
+    cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = cmatrix, display_labels = [False, True])
+    cm_display.plot(ax=ax)
+    st.pyplot(fig)
+    #cm_display.plot()
+   # plt.show()
+   # cmatrix - pd.DataFrame(cmatrix, index = [0, 1], columns = [0, 1])
+    #cm_cv.index.name = "Actual"
+    #cm_cv.columns.name = "Predicted"
+    #plt.figure(figsize = (10, 10))
+    #sns.heatmap(cmatrix, cmap = "Blues", annot = True, fmt = '')
 
 # Checkpoint 10
 def plot_pr_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
@@ -303,9 +312,12 @@ if df is not None:
             )
             ############## Task 10: Compute evaluation metrics
             if 'Confusion Matrix' in review_plot:
-                trained_select = [st.session_state[model]
-                                  for model in model_select]
-                plot_cmatrix(X_train, y_train, model, metric_select)
+                models = [st.session_state[model]
+                          for model in model_select]
+                #trained_select = [st.session_state[model]
+                #                 for model in model_select]
+                for model in models:
+                    plot_cmatrix(X_train, y_train, model)
             if 'Precision/Recall Curve' in review_plot:
                 trained_select = [st.session_state[model]
                                   for model in model_select]
