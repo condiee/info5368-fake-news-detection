@@ -258,13 +258,11 @@ def inspect_coefficients(trained_models):
         - trained_models: list of trained names (strings)
     Output:
         - out_dict: a dicionary contains the coefficients of the selected models, with the following keys:
-            - 'Logistic Regression'
-            - 'Stochastic Gradient Descent'
-            - 'Stochastic Gradient Descent with Cross Validation'
     """
     out_dict = {'Logistic Regression': [],
-                'Stochastic Gradient Descent with Logistic Regression': [],
-                'Stochastic Gradient Descent with Cross Validation': []}
+                'Random Forest': [], 
+                'SVM': [], 
+                'Naïve Bayes': []}
     # Add code here
 
     # print("MODELS:", trained_models)
