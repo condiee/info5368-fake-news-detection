@@ -1,11 +1,12 @@
 import numpy as np                      # pip install numpy
 from sklearn.model_selection import train_test_split
 import streamlit as st                  # pip install streamlit
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
+#from tensorflow import keras
 import random
 from helper_functions import fetch_dataset, set_pos_neg_reviews
 random.seed(10)
@@ -49,6 +50,7 @@ def split_dataset(df, number, target, feature_encoding, random_state=42):
 
         # Split the train and test sets into X_train, X_val, y_train, y_val using X, y, number/100, and random_state
         # Add code here
+        
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=number/100, random_state=random_state)
 
         # Use the column word_count and tf_idf_word_count as a feature prefix on X_train and X_val sets
@@ -84,6 +86,23 @@ def split_dataset(df, number, target, feature_encoding, random_state=42):
 #logistic regression, random forest, SVM, naive bayes, CNN
 
 # Checkpoint 5
+def train_grid_logistic_regression(X_train, y_train, model_name):
+    lg = None
+    try:
+        lg = LogisticRegression()
+        param_grid = {'solver' : ['liblinear', 'lbfgs', 'newton-cg',
+                       'newton-cholesky', 'sag', 'saga'], 'penalty': ['l1', 'l2'], 'tol' : [0.0001, 
+                       0.001, 0.01,0.1 ], 'max_iter' : [1000, 2000, 3000, 4000, 5000]}
+        lg_model = GridSearchCV(lg, param_grid, cv=5)
+        lg_model.fit(X_train, np.ravel(y_train))
+        st.session_state[model_name] = lg_model
+    except:
+        print('Exception thrown; cannot train logit model')
+
+    # 5. Return the trained model
+    return lg_model
+
+
 def train_logistic_regression(X_train, y_train, model_name, params, random_state=42):
     """
     This function trains the model with logistic regression and stores it in st.session_state[model_name].
@@ -105,8 +124,8 @@ def train_logistic_regression(X_train, y_train, model_name, params, random_state
         lg_model = LogisticRegression(random_state=random_state, max_iter=params['max_iter'], 
                                       solver=params['solver'], tol=params['tol'], penalty=params['penalty'])
 
-        # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
-        # Remember to create a continuous y_train array using np.ravel() function.
+            # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
+            # Remember to create a continuous y_train array using np.ravel() function.
         lg_model.fit(X_train, np.ravel(y_train))
     
         # 4. Save the model in st.session_state[model_name].
@@ -118,18 +137,32 @@ def train_logistic_regression(X_train, y_train, model_name, params, random_state
     # 5. Return the trained model
     return lg_model
 
+def train_grid_random_forest(X_train, y_train, model_name):
+    rf = None
+    try:
+        rf = RandomForestClassifier()
+        param_grid = {'n_estimators' : [50,100,150,200], 'max_depth' : [10,20,30,40,50]}
+        rf_model = GridSearchCV(rf, param_grid, cv=5)
+        rf_model.fit(X_train, y_train)
+        st.session_state[model_name] = rf_model
+    except:
+        print('Exception thrown; cannot train random forest model')
+
+    # 5. Return the trained model
+    return rf_model
+
 def train_random_forest(X_train, y_train, model_name, params, random_state=42):
 
     rf_model = None
     # Add code here
     # 1. Create a try and except block to train a logistic regression model.
     try:
-        # 2. Create a LogisticRegression class object using the random_state as input.
+            # 2. Create a LogisticRegression class object using the random_state as input.
         rf_model = RandomForestClassifier(random_state=random_state, n_estimators=params['n_estimators'], 
                                       max_depth=params['max_depth'])
 
-        # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
-        # Remember to create a continuous y_train array using np.ravel() function.
+            # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
+            # Remember to create a continuous y_train array using np.ravel() function.
         rf_model.fit(X_train, y_train)
     
         # 4. Save the model in st.session_state[model_name].
@@ -141,18 +174,32 @@ def train_random_forest(X_train, y_train, model_name, params, random_state=42):
     # 5. Return the trained model
     return rf_model
 
+def train_grid_svm(X_train, y_train, model_name):
+    svm = None
+    try:
+        svm = SVC()
+        param_grid = {'kernal' : ['linear', 'poly', 'rbf', 'sigmoid'], 'C' : [0.001, 0.01, 0.1, 1, 10, 100]}        
+        svm_model = GridSearchCV(svm, param_grid, cv=5)
+        svm_model.fit(X_train, y_train)
+        st.session_state[model_name] = svm_model
+    except:
+        print('Exception thrown; cannot train svm model')
+
+    # 5. Return the trained model
+    return svm_model
+
 def train_svm(X_train, y_train, model_name, params, random_state=42):
     
     svm_model = None
     # Add code here
     # 1. Create a try and except block to train a logistic regression model.
     try:
-        # 2. Create a LogisticRegression class object using the random_state as input.
+            # 2. Create a LogisticRegression class object using the random_state as input.
         svm_model = SVC(random_state=random_state, kernal=params['kernal'], 
                                       C=params['C'])
 
-        # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
-        # Remember to create a continuous y_train array using np.ravel() function.
+            # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
+            # Remember to create a continuous y_train array using np.ravel() function.
         svm_model.fit(X_train, y_train)
     
         # 4. Save the model in st.session_state[model_name].
@@ -164,17 +211,31 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
     # 5. Return the trained model
     return svm_model
 
+def train_grid_naive_bayes(X_train, y_train, model_name):
+    nb = None
+    try:
+        nb = GaussianNB()
+        param_grid = {'var_smoothing' : [1e-9, 1e-8, 1e-7, 1e-6, 1e-5]}       
+        nb_model = GridSearchCV(nb, param_grid, cv=5)
+        nb_model.fit(X_train, y_train)
+        st.session_state[model_name] = nb_model
+    except:
+        print('Exception thrown; cannot train naive bayes model')
+
+    # 5. Return the trained model
+    return nb_model
+
 def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
     
     nb_model = None
     # Add code here
     # 1. Create a try and except block to train a logistic regression model.
     try:
-        # 2. Create a LogisticRegression class object using the random_state as input.
-        nb_model = GaussianNB()
+            # 2. Create a LogisticRegression class object using the random_state as input.
+        nb_model = GaussianNB(var_smoothing=params['var_smoothing'])
 
-        # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
-        # Remember to create a continuous y_train array using np.ravel() function.
+            # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
+            # Remember to create a continuous y_train array using np.ravel() function.
         nb_model.fit(X_train, y_train)
     
         # 4. Save the model in st.session_state[model_name].
@@ -186,6 +247,7 @@ def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
     # 5. Return the trained model
     return nb_model
 
+
 # Checkpoint 8
 
 def inspect_coefficients(trained_models):
@@ -196,31 +258,43 @@ def inspect_coefficients(trained_models):
         - trained_models: list of trained names (strings)
     Output:
         - out_dict: a dicionary contains the coefficients of the selected models, with the following keys:
+            - 'Logistic Regression'
+            - 'Stochastic Gradient Descent'
+            - 'Stochastic Gradient Descent with Cross Validation'
     """
     out_dict = {'Logistic Regression': [],
-                'Random Forest': [], 
-                'SVM': [], 
-                'Naïve Bayes': []}
+                'Stochastic Gradient Descent with Logistic Regression': [],
+                'Stochastic Gradient Descent with Cross Validation': []}
     # Add code here
-    for name, model in trained_models.items():
-        if (model is not None):
-            coef = model.coef_
-            out_dict[name] = coef
-            if coef is not None:
-                st.write('### Coefficients inspection for {0}'.format(name))
-                st.dataframe(out_dict[name])
-                st.write('Total number of coefficients: {0}'.format(coef.shape[1]))
-                st.write('Number of positive coefficients: {0}'.format(
-                    len(coef[coef > 0])))
-                st.write('Number of negative coefficients: {0}'.format(
-                    len(coef[coef < 0])))
-            else:
-                st.write('Coefficients for {0} is None'.format(name))
 
-            if ('cv_results_' in st.session_state):
-                st.dataframe(st.session_state['cv_results_'])
+    # print("MODELS:", trained_models)
+    # 1. Write a for loop through the model names and trained models.
+    for name, model in trained_models.items():
+        # 2. In the for loop,
+        # a. check that the model is not None
+        # assert model is not None
+        # b. If the model is valid, store the coefficients in out_dict[name] using model.coef
+        # (same for all models) and display the coefficients.
+        if model is not None:
+            out_dict[name] = model.coef_
+            st.write(f"**{name}** coefficents: {model.coef_[0]}")
+
+            # c. Compute and print the following values:
+            # i. Total number of coefficients
+            st.write(f"There are {len(model.coef_[0])} total coefficients.")
+
+            # ii. Number of positive coefficients
+            st.write(f"There are {sum([x for x in model.coef_[0]>=0])} positive coefficients.")
+
+            # iii. Number of negative coefficients
+            st.write(f"There are {sum([x for x in model.coef_[0]<0])} negative coefficients.")
+
+    # 3. Display ‘cv_results_’ in st.session_state[‘cv_results_’] if it exists (from Checkpoint 7)
+    if 'cv_results_' in st.session_state:
+        st.write("**Cross Validation Results:**", st.session_state['cv_results_'])
                         
     return out_dict
+
 
 
 ###################### FETCH DATASET #######################
@@ -231,18 +305,6 @@ if df is not None:
 
     # Display dataframe as table
     st.dataframe(df)
-
-    # Select positive and negative ratings
-    pos_neg_select = st.slider(
-        'Select a range of ratings for negative reviews',
-        1, 5, 3,
-        key='pos_neg_selectbox')
-
-    if (pos_neg_select and st.button('Set negative sentiment upper bound')):
-        df = set_pos_neg_reviews(df, pos_neg_select)
-
-        st.write('You selected ratings positive rating greater than {}'.format(
-            pos_neg_select))
 
     # Select variable to predict
     feature_predict_select = st.selectbox(
@@ -309,57 +371,60 @@ if df is not None:
     if (classification_methods_options[0] in classification_model_select or classification_methods_options[0] in trained_models):
         st.markdown('#### ' + classification_methods_options[0])
 
-        lg_col1, lg_col2 = st.columns(2)
-
-        with (lg_col1):
-            # solver: algorithm to use in the optimization problem
-            solvers = ['liblinear', 'lbfgs', 'newton-cg',
+        if st.button('Train Logistic Regression with Grid Search Best Parameters'):
+            train_grid_logistic_regression(
+                X_train, y_train, classification_methods_options[0])
+        else:
+            lg_col1, lg_col2 = st.columns(2)
+            with (lg_col1):
+                # solver: algorithm to use in the optimization problem
+                solvers = ['liblinear', 'lbfgs', 'newton-cg',
                        'newton-cholesky', 'sag', 'saga']
-            lg_solvers = st.selectbox(
+                lg_solvers = st.selectbox(
                 label='Select solvers for SGD',
                 options=solvers,
                 key='lg_reg_solver_multiselect'
-            )
-            st.write('You select the following solver(s): {}'.format(lg_solvers))
+                )
+                st.write('You select the following solver(s): {}'.format(lg_solvers))
 
-            # penalty: 'l1' or 'l2' regularization
-            lg_penalty_select = st.selectbox(
+                # penalty: 'l1' or 'l2' regularization
+                lg_penalty_select = st.selectbox(
                 label='Select penalty for SGD',
                 options=['l2', 'l1'],
                 key='lg_penalty_multiselect'
-            )
-            st.write('You select the following penalty: {}'.format(
+                )
+                st.write('You select the following penalty: {}'.format(
                 lg_penalty_select))
 
-        with (lg_col2):
-            # tolerance: stopping criteria for iterations
-            lg_tol = st.text_input(
+            with (lg_col2):
+                # tolerance: stopping criteria for iterations
+                lg_tol = st.text_input(
                 label='Input a tolerance value',
                 value='0.01',
                 key='lg_tol_textinput'
-            )
-            lg_tol = float(lg_tol)
-            st.write('You select the following tolerance value: {}'.format(lg_tol))
+                )
+                lg_tol = float(lg_tol)
+                st.write('You select the following tolerance value: {}'.format(lg_tol))
 
-            # max_iter: maximum iterations to run the LG until convergence
-            lg_max_iter = st.number_input(
+                # max_iter: maximum iterations to run the LG until convergence
+                lg_max_iter = st.number_input(
                 label='Enter the number of maximum iterations on training data',
                 min_value=1000,
                 max_value=5000,
                 value=1000,
                 step=100,
                 key='lg_max_iter_numberinput'
-            )
-            st.write('You set the maximum iterations to: {}'.format(lg_max_iter))
+                )
+                st.write('You set the maximum iterations to: {}'.format(lg_max_iter))
 
-        lg_params = {
+            lg_params = {
             'max_iter': lg_max_iter,
             'penalty': lg_penalty_select,
             'tol': lg_tol,
             'solver': lg_solvers,
-        }
-        if st.button('Train Logistic Regression Model'):
-            train_logistic_regression(
+            }
+            if st.button('Train Logistic Regression Model'):
+                train_logistic_regression(
                 X_train, y_train, classification_methods_options[0], lg_params)
 
         if classification_methods_options[0] not in st.session_state:
@@ -367,161 +432,120 @@ if df is not None:
         else:
             st.write('Logistic Regression Model trained')
 
-    # # Task 6: Stochastic Gradient Descent with Logistic Regression
-    # if (classification_methods_options[1] in classification_model_select or classification_methods_options[2] in trained_models):
-    #     st.markdown('#### ' + classification_methods_options[1])
+    # Task 6: Random Forest
+    if (classification_methods_options[1] in classification_model_select or classification_methods_options[1] in trained_models):
+        st.markdown('#### ' + classification_methods_options[1])
 
-    #     # Loss: 'log' is logistic regression, 'hinge' for Support Vector Machine
-    #     sdg_loss_select = 'log'
+        if st.button('Train Random Forest with Grid Search Best Parameters'):
+            train_grid_random_forest(
+                X_train, y_train, classification_methods_options[1])
+        else:
+            rf_col1, rf_col2 = st.columns(2)
+            with (rf_col1):
+                n_est = st.number_input(
+                label='Enter the number of estimators on training data',
+                min_value=10,
+                max_value=500,
+                value=50,
+                step=10,
+                key='rf_n_est_numberinput'
+                )
+                st.write('You set the number of estimators to: {}'.format(n_est))
+            with (rf_col2):
+                max_dep = st.number_input(
+                label='Enter the max depth on training data',
+                min_value=10,
+                max_value=100,
+                value=50,
+                step=10,
+                key='rf_max_dep_numberinput'
+                )
+                st.write('You set the max depth to: {}'.format(max_dep))
 
-    #     sgd_col1, sgd_col2 = st.columns(2)
+            rf_params = {
+            'n_estimators': n_est,
+            'max_depth': max_dep,
+            }
+            if st.button('Train Random Forest Model'):
+                train_random_forest(
+                X_train, y_train, classification_methods_options[1], rf_params)
 
-    #     with (sgd_col1):
-    #         # max_iter: maximum iterations to run the iterative SGD
-    #         sdg_max_iter = st.number_input(
-    #             label='Enter the number of maximum iterations on training data',
-    #             min_value=1000,
-    #             max_value=5000,
-    #             value=1000,
-    #             step=100,
-    #             key='sgd_max_iter_numberinput'
-    #         )
-    #         st.write('You set the maximum iterations to: {}'.format(sdg_max_iter))
+        if classification_methods_options[1] not in st.session_state:
+            st.write('Random Forest Model is untrained')
+        else:
+            st.write('Random Forest Model trained')
 
-    #         # penalty: 'l1' or 'l2' regularization
-    #         sdg_penalty_select = st.selectbox(
-    #             label='Select penalty for SGD',
-    #             options=['l2', 'l1'],
-    #             key='sdg_penalty_multiselect'
-    #         )
-    #         st.write('You select the following penalty: {}'.format(
-    #             sdg_penalty_select))
+    # Task 7: SVM
+    if (classification_methods_options[2] in classification_model_select or classification_methods_options[2] in trained_models):
+        st.markdown('#### ' + classification_methods_options[2])
 
-    #     with (sgd_col2):
-    #         # alpha=0.001: Constant that multiplies the regularization term. Ranges from [0 Inf)
-    #         sdg_alpha = st.text_input(
-    #             label='Input one alpha value',
-    #             value='0.001',
-    #             key='sdg_alpha_numberinput'
-    #         )
-    #         sdg_alpha = float(sdg_alpha)
-    #         st.write('You select the following alpha value: {}'.format(sdg_alpha))
+        if st.button('Train SVM with Grid Search Best Parameters'):
+            train_grid_svm(
+                X_train, y_train, classification_methods_options[2])
+        else:
+            svm_col1, svm_col2 = st.columns(2)
+            with (svm_col1):
+                c = st.number_input(
+                label='Enter the value of C',
+                min_value=0.0001,
+                max_value=100,
+                value=0.1,
+                step=0.1,
+                key='svm_c_numberinput'
+                )
+                st.write('You set c to: {}'.format(c))
+            with (svm_col2):
+                kernal = st.selectbox(
+                label='Select kernal for SVM',
+                options=['linear', 'poly', 'rbf', 'sigmoid'],
+                key='svm_kernal_multiselect'
+                )
+                st.write('You set the kernal to: {}'.format(kernal))
 
-    #         # tolerance: stopping criteria for iterations
-    #         sgd_tol = st.text_input(
-    #             label='Input a tolerance value',
-    #             value='0.01',
-    #             key='sgd_tol_textinput'
-    #         )
-    #         sgd_tol = float(sgd_tol)
-    #         st.write('You select the following tolerance value: {}'.format(sgd_tol))
+            svm_params = {
+            'C': c,
+            'kernal': kernal,
+            }
+            if st.button('Train SVM Model'):
+                train_svm(
+                X_train, y_train, classification_methods_options[2], svm_params)
 
-    #     sgd_params = {
-    #         'loss': sdg_loss_select,
-    #         'max_iter': sdg_max_iter,
-    #         'penalty': sdg_penalty_select,
-    #         'tol': sgd_tol,
-    #         'alpha': sdg_alpha,
-    #     }
+        if classification_methods_options[2] not in st.session_state:
+            st.write('SVM Model is untrained')
+        else:
+            st.write('SVM Model trained')
 
-    #     if st.button('Train Stochastic Gradient Descent Model'):
-    #         train_sgd_classifer(
-    #             X_train, y_train, classification_methods_options[1], sgd_params)
+    # Task 8: Naive Bayes
+    if (classification_methods_options[3] in classification_model_select or classification_methods_options[3] in trained_models):
+        st.markdown('#### ' + classification_methods_options[3])
 
-    #     if classification_methods_options[1] not in st.session_state:
-    #         st.write('Stochastic Gradient Descent Model is untrained')
-    #     else:
-    #         st.write('Stochastic Gradient Descent Model trained')
+        if st.button('Train Naive Bayes with Grid Search Best Parameters'):
+            train_grid_naive_bayes(
+                X_train, y_train, classification_methods_options[3])
+        else:
+            var = st.number_input(
+            label='Enter the value of var smoothing',
+            min_value=0.0000001,
+            max_value=0.1,
+            value=0.001,
+            step=0.01,
+            key='nb_var_numberinput'
+            )
+            st.write('You set var smoothing to: {}'.format(var))
 
-    # # ############## Task 7: Stochastic Gradient Descent with Logistic Regression with Cross Validation
-    # if (classification_methods_options[2] in classification_model_select or classification_methods_options[2] in trained_models):
-    #     st.markdown('#### ' + classification_methods_options[2])
+            nb_params = {
+            'var_smoothing': var,
+            }
+            if st.button('Train Naive Bayes Model'):
+                train_naive_bayes(
+                X_train, y_train, classification_methods_options[3], nb_params)
 
-    #     # Loss: "squared_error": Ordinary least squares, huber": Huber loss for robust regression, "epsilon_insensitive": linear Support Vector Regression.
-    #     sdgcv_loss_select = 'log_loss'
+        if classification_methods_options[3] not in st.session_state:
+            st.write('Naieve Bayes Model is untrained')
+        else:
+            st.write('Naive Bayes Model trained')
 
-    #     sdg_col, sdgcv_col = st.columns(2)
-
-    #     # Collect Parameters
-    #     with (sdg_col):
-    #         # max_iter: maximum iterations to run the iterative SGD
-    #         sdgcv_max_iter = st.number_input(
-    #             label='Enter the number of maximum iterations on training data',
-    #             min_value=1000,
-    #             max_value=5000,
-    #             value=1000,
-    #             step=100,
-    #             key='sgdcv_max_iter_numberinput'
-    #         )
-    #         st.write('You set the maximum iterations to: {}'.format(sdgcv_max_iter))
-
-    #         # penalty: 'l1' or 'l2' regularization
-    #         sdgcv_penalty_select = st.selectbox(
-    #             label='Select penalty for SGD',
-    #             options=['l2', 'l1'],
-    #             # default='l1',
-    #             key='sdgcv_penalty_select'
-    #         )
-    #         st.write('You select the following penalty: {}'.format(
-    #             sdgcv_penalty_select))
-
-    #         # tolerance: stopping criteria for iterations
-    #         sgdcv_tol = st.text_input(
-    #             label='Input a tolerance value',
-    #             value='0.01',
-    #             key='sdgcv_tol_numberinput'
-    #         )
-    #         sgdcv_tol = float(sgdcv_tol)
-    #         st.write(
-    #             'You select the following tolerance value: {}'.format(sgdcv_tol))
-
-    #     # Collect Parameters
-    #     with (sdgcv_col):
-    #         # alpha=0.01: Constant that multiplies the regularization term. Ranges from [0 Inf)
-    #         sdgcv_alphas = st.text_input(
-    #             label='Input alpha values, separate by comma',
-    #             value='0.001,0.0001',
-    #             key='sdgcv_alphas_textinput'
-    #         )
-    #         sdgcv_alphas = [float(val) for val in sdgcv_alphas.split(',')]
-    #         st.write(
-    #             'You select the following alpha value: {}'.format(sdgcv_alphas))
-
-    #         sgdcv_params = {
-    #             'loss': [sdgcv_loss_select],
-    #             'max_iter': [sdgcv_max_iter],
-    #             'penalty': [sdgcv_penalty_select],
-    #             'tol': [sgdcv_tol],
-    #             'alpha': sdgcv_alphas,
-    #         }
-
-    #         st.markdown('Select SGD Cross Validation Parameters')
-    #         # n_splits: number of folds
-    #         sgdcv_cv_n_splits = st.number_input(
-    #             label='Enter the number of folds',
-    #             min_value=2,
-    #             max_value=len(df),
-    #             value=3,
-    #             step=1,
-    #             key='sdgcv_cv_nsplits'
-    #         )
-    #         st.write('You select the following split value(s): {}'.format(
-    #             sgdcv_cv_n_splits))
-
-    #         sgdcv_cv_params = {
-    #             'n_splits': sgdcv_cv_n_splits,
-    #         }
-
-    #     if st.button('Train Stochastic Gradient Descent Model with Cross Validation'):
-    #         train_sgdcv_classifer(
-    #             X_train, y_train, classification_methods_options[2], sgdcv_params, sgdcv_cv_params)
-
-    #     if classification_methods_options[2] not in st.session_state:
-    #         st.write(
-    #             'Stochastic Gradient Descent Model with Cross Validation is untrained')
-    #     else:
-    #         st.write(
-    #             'Stochastic Gradient Descent Model with Cross Validation trained')
+    
 
     # Task 9: Inspect classification coefficients
     st.markdown('## Inspect model coefficients')
