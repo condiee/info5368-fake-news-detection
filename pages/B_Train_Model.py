@@ -176,7 +176,8 @@ def train_grid_svm(X_train, y_train, model_name):
     svm = None
     try:
         svm = SVC()
-        param_grid = {'kernal' : ['linear', 'poly', 'rbf', 'sigmoid'], 'C' : [0.001, 0.01, 0.1, 1, 10, 100]}        
+        ## changed to e here
+        param_grid = {'kernel' : ['linear', 'poly', 'rbf', 'sigmoid'], 'C' : [0.001, 0.01, 0.1, 1, 10, 100]}        
         svm_model = GridSearchCV(svm, param_grid, cv=5)
         svm_model.fit(X_train, y_train)
         st.session_state[model_name] = svm_model
@@ -190,7 +191,8 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
     svm_model = None
     # Add code here
     try:
-        svm_model = SVC(random_state=random_state, kernal=params['kernal'], 
+        ## changed to e here
+        svm_model = SVC(random_state=random_state, kernel=params['kernal'], 
                                       C=params['C'])
 
             # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
@@ -497,7 +499,8 @@ if df is not None:
 
             svm_params = {
             'C': c,
-            'kernal': kernal,
+            ### changing to e here
+            'kernel': kernal,
             }
             if st.button('Train SVM Model'):
                 train_svm(
