@@ -88,8 +88,8 @@ def word_count_encoder(df, feature, word_encoder):
 
     # 6. Update the confirmation statement to show the length of the word_count dataframe
     # (Uncomment code) Show confirmation statement
-    st.write('Feature {} has been word count encoded from {} reviews.'.format(
-    feature, len(word_count_df)))
+    st.write('The {} feature is now word count encoded.'.format(
+    feature))
 
     # (Uncomment code) Store new features in st.session_state
     st.session_state['data'] = df
@@ -140,7 +140,7 @@ def tf_idf_encoder(df, feature, word_encoder):
     
     # (Uncomment code) Show confirmation statement
     st.write(
-       'Feature {} has been TF-IDF encoded from {} reviews.'.format(feature, len(word_count_df)))
+       'The {} feature has been TF-IDF encoded.'.format(feature))
 
     # (Uncomment code) Store new features in st.session_state
     st.session_state['data'] = df
