@@ -249,7 +249,7 @@ def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
         st.session_state[model_name] = nb_model
 
     except Exception as e:
-        st.write("***Please choose different hyperparameters:***",e.args)
+        st.write("***Please choose different hyperparameters:***", e.args)
         print('Exception thrown; cannot train naive bayes model')
 
     # 5. Return the trained model
