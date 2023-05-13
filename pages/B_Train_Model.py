@@ -200,7 +200,7 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
     # Add code here
     try:
         svm_model = SVC(random_state=random_state, kernel=params['kernel'], 
-                                      C=params['C'])
+                                      C=params['C'], probability=True)
 
             # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
             # Remember to create a continuous y_train array using np.ravel() function.
