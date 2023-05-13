@@ -250,8 +250,10 @@ def compute_f1(y_true, y_pred):
     Output:
         - F1 score
     """
-    # F1 = 2 * (precision * recall) / (precision + recall)
     f1 = f1_score(y_true, y_pred)
+    # precision = precision_score(y_true, y_pred)
+    # recall = recall_score(y_true, y_pred)
+    # f1 = 2 * (precision * recall) / (precision + recall)
     return f1
 
 # Page B

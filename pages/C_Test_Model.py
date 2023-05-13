@@ -27,7 +27,7 @@ METRICS_MAP = {
     'precision': compute_precision,
     'recall': compute_recall,
     'accuracy': compute_accuracy,
-    'f1': compute_f1
+    'f1 score': compute_f1
 }
 
 # Checkpoint 9
@@ -274,7 +274,7 @@ if df is not None:
     X_train, X_val, y_train, y_val = restore_data_splits(df)
 
     st.markdown("## Get Performance Metrics")
-    metric_options = ['precision', 'recall', 'accuracy', 'f1']
+    metric_options = ['precision', 'recall', 'accuracy', 'f1 score']
 
     classification_methods_options = ['Logistic Regression',
                                       'Stochastic Gradient Descent with Logistic Regression',
