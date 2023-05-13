@@ -111,7 +111,7 @@ def train_logistic_regression(X_train, y_train, model_name, params, random_state
         st.session_state[model_name] = lg_model
 
     except Exception as e:
-        st.write("Please choose different hyperparameters:",e)
+        st.write("***Please choose different hyperparameters:***",e.args)
         print('Exception thrown; cannot train logit model', e)
 
 #     # 5. Return the trained model
@@ -133,7 +133,7 @@ def train_grid_logistic_regression(X_train, y_train, model_name):
         st.write("tuned hpyerparameters: (best parameters) ",lg_model.best_params_)
         st.write("accuracy :",lg_model.best_score_)
     except Exception as e:
-        st.write("Please choose different hyperparameters:",e)
+        st.write("***Please choose different hyperparameters:***",e.args)
         print('Exception thrown; cannot train logit model. ERROR:', e)
 
     # 5. Return the trained model
@@ -172,7 +172,7 @@ def train_random_forest(X_train, y_train, model_name, params, random_state=42):
         st.session_state[model_name] = rf_model
 
     except Exception as e:
-        st.write("Please choose different hyperparameters:",e)
+        st.write("***Please choose different hyperparameters:***",e.args)
         print('Exception thrown; cannot train random forest model. ERROR:', e)
 
     # 5. Return the trained model
@@ -189,7 +189,7 @@ def train_grid_svm(X_train, y_train, model_name):
         st.write("tuned hpyerparameters: (best parameters) ", svm_model.best_params_)
         st.write("accuracy :", svm_model.best_score_)
     except Exception as e:
-        st.write("Please choose different hyperparameters:",e)
+        st.write("***Please choose different hyperparameters:***",e.args)
         print('Exception thrown; cannot train svm model. ERROR:', e)
     # 5. Return the trained model
     return svm_model
@@ -210,7 +210,7 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
         st.session_state[model_name] = svm_model
 
     except Exception as e:
-        st.write("Please choose different hyperparameters:",e)
+        st.write("***Please choose different hyperparameters:***",e.args)
         print('Exception thrown; cannot train svm model. ERROR:', e)
 
     # 5. Return the trained model
@@ -227,7 +227,7 @@ def train_grid_naive_bayes(X_train, y_train, model_name):
         st.write("tuned hpyerparameters: (best parameters) ", nb_model.best_params_)
         st.write("accuracy :", nb_model.best_score_)
     except Exception as e:
-        st.write("Please choose different hyperparameters:",e)
+        st.write("***Please choose different hyperparameters:***",e.args)
         print('Exception thrown; cannot train naive bayes model. ERROR:', e)
 
     # 5. Return the trained model
@@ -249,7 +249,7 @@ def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
         st.session_state[model_name] = nb_model
 
     except Exception as e:
-        st.write("Please choose different hyperparameters:",e)
+        st.write("***Please choose different hyperparameters:***",e.args)
         print('Exception thrown; cannot train naive bayes model')
 
     # 5. Return the trained model
