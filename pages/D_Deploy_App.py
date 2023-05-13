@@ -86,15 +86,19 @@ if df is not None:
         if 'count_vect' in st.session_state:
             count_vect = st.session_state['count_vect']            
             text_count = count_vect.transform([user_input_updates])
-
-            if model_select == 'SVM':
-                encoded_user_input = pd.DataFrame(text_count.toarray())
-            else: 
-                encoded_user_input = text_count
             
             if 'tfidf_transformer' in st.session_state:
                 tfidf_transformer = st.session_state['tfidf_transformer']
-                encoded_user_input = tfidf_transformer.transform(text_count) #.toarray()
+                tfidf = tfidf_transformer.transform(text_count)
+                if model_select == 'SVM':
+                    encoded_user_input = pd.DataFrame(tfidf.toarray())
+                else:
+                    encoded_user_input = tfidf             
+            else: # word count encoder
+                if model_select == 'SVM':
+                    encoded_user_input = pd.DataFrame(text_count.toarray())
+                else: 
+                    encoded_user_input = text_count
 
             # SENTIMENT ANALYSIS
             sentiment = SentimentIntensityAnalyzer()
@@ -107,9 +111,8 @@ if df is not None:
             elif sentiment == 'neg':
                 sentiment = "negative"
 
-            # st.write("CLASSIFICATION:", classification)
             classification = deploy_model(encoded_user_input)
-            st.write("classification:", classification[0])
+            # st.write("classification:", classification[0])
             if(classification == 1):
                 decision = "fake"
             elif classification == 0:

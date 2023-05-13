@@ -110,7 +110,7 @@ def train_logistic_regression(X_train, y_train, model_name, params, random_state
     
 #         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = lg_model
-        st.session[model_name + '_coef'] = lg_model.coef_
+        st.session_state[model_name + '_coef'] = lg_model.coef_
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***",e.args)
@@ -133,7 +133,7 @@ def train_grid_logistic_regression(X_train, y_train, model_name):
         lg_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = lg_model
         x = lg_model.best_estimator_
-        st.session[model_name + '_coef'] = x.coef_
+        st.session_state[model_name + '_coef'] = x.coef_
         st.write("tuned hpyerparameters: (best parameters) ",lg_model.best_params_)
         st.write("accuracy :",lg_model.best_score_)
     except Exception as e:
@@ -151,8 +151,7 @@ def train_grid_random_forest(X_train, y_train, model_name):
         rf_model = GridSearchCV(rf, param_grid, cv=5)
         rf_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = rf_model
-        x = rf_model.best_estimator_
-        st.session[model_name + '_coef'] = x.coef_
+        # x = rf_model.best_estimator_
         st.write("tuned hpyerparameters: (best parameters) ", rf_model.best_params_)
         st.write("accuracy :", rf_model.best_score_)
     except Exception as e:
@@ -176,7 +175,6 @@ def train_random_forest(X_train, y_train, model_name, params, random_state=42):
     
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = rf_model
-        st.session[model_name + '_coef'] = rf_model.coef_
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***",e.args)
@@ -193,8 +191,9 @@ def train_grid_svm(X_train, y_train, model_name):
         svm_model = GridSearchCV(svm, param_grid, cv=5)
         svm_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = svm_model
+        # st.write("DENSE?", X_train)
         x = svm_model.best_estimator_
-        st.session[model_name + '_coef'] = x.coef_
+        st.session_state[model_name + '_coef'] = x.coef_
         st.write("tuned hpyerparameters: (best parameters) ", svm_model.best_params_)
         st.write("accuracy :", svm_model.best_score_)
     except Exception as e:
@@ -217,7 +216,7 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
     
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = svm_model
-        st.session[model_name + '_coef'] = svm_model.coef_
+        st.session_state[model_name + '_coef'] = svm_model.coef_
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***",e.args)
@@ -235,7 +234,7 @@ def train_grid_naive_bayes(X_train, y_train, model_name):
         nb_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = nb_model
         x = nb_model.best_estimator_
-        st.session[model_name + '_coef'] = x.coef_
+        st.session_state[model_name + '_coef'] = x.coef_
         st.write("tuned hpyerparameters: (best parameters) ", nb_model.best_params_)
         st.write("accuracy :", nb_model.best_score_)
     except Exception as e:
@@ -259,7 +258,7 @@ def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
     
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = nb_model
-        st.session[model_name + '_coef'] = np.exp(nb_model.feature_log_prob_)
+        st.session_state[model_name + '_coef'] = np.exp(nb_model.feature_log_prob_)
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***", e.args)
@@ -267,9 +266,6 @@ def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
 
     # 5. Return the trained model
     return nb_model
-
-
-# Checkpoint 8
 
 def inspect_coefficients(trained_models):
     """
@@ -284,16 +280,10 @@ def inspect_coefficients(trained_models):
                 'Random Forest': [], 
                 'SVM': [], 
                 'Naïve Bayes': []}
-    # Add code here
 
     # print("MODELS:", trained_models)
     # 1. Write a for loop through the model names and trained models.
     for name, model in trained_models.items():
-        # 2. In the for loop,
-        # a. check that the model is not None
-        # assert model is not None
-        # b. If the model is valid, store the coefficients in out_dict[name] using model.coef
-        # (same for all models) and display the coefficients.
         if model is not None:
             #if name == 'Naïve Bayes':
             #    out_dict[name] = np.exp(model.feature_log_prob_)
@@ -319,16 +309,16 @@ def inspect_coefficients(trained_models):
             #    st.write(f"There are {sum([x for x in model.coef_[0]<0])} negative coefficients.")
             coef = st.session_state[name + "_coef"]
             out_dict[name] = coef
-            st.write(f"**{name}** coefficents: {model.coef_[0]}")
+            st.write(f"**{name}** coefficents: {coef[0]}")
             # c. Compute and print the following values:
             # i. Total number of coefficients
-            st.write(f"There are {len(model.coef_[0])} total coefficients.")
+            st.write(f"There are {len(coef[0])} total coefficients.")
 
                 # ii. Number of positive coefficients
-            st.write(f"There are {sum([x for x in model.coef_[0]>=0])} positive coefficients.")
+            st.write(f"There are {sum([x for x in coef[0]>=0])} positive coefficients.")
 
                 # iii. Number of negative coefficients
-            st.write(f"There are {sum([x for x in model.coef_[0]<0])} negative coefficients.")
+            st.write(f"There are {sum([x for x in coef[0]<0])} negative coefficients.")
 
             
     # 3. Display ‘cv_results_’ in st.session_state[‘cv_results_’] if it exists (from Checkpoint 7)
@@ -358,28 +348,29 @@ if df is not None:
     #     options=df.columns,
     #     key='feature_selectbox',
     # )
-    feature_predict_select = 'label'
-    st.session_state['target'] = feature_predict_select
+    feature_predict = 'label'
+    st.session_state['target'] = feature_predict
 
     word_count_encoder_options = ['Word Count', 'TF-IDF']
     if ('word_encoder' in st.session_state):
         if (st.session_state['word_encoder'] is not None):
-            word_count_encoder_options = st.session_state['word_encoder']
-            st.write('Restoring selected encoded features {}'.format(
-                word_count_encoder_options))
+            # word_count_encoder_options = st.session_state['word_encoder']
+            # st.write('Restoring selected encoded features {}'.format(word_count_encoder_options))
+            feature_input = st.session_state['word_encoder'] # feature_input_select
+            st.session_state['feature'] = feature_input[0]
+            st.write(f"*The model with be trained on **{feature_input[0]}** -encoded features to predict whether text is real or fake news.*")
+    else:
+        st.write("*Please encode the feature you would like to use to train the model on page A.*")
 
     # Select input features
-    feature_input_select = st.selectbox(
-        label='Select (encoded) features for classification input',
-        options=word_count_encoder_options,
-        key='feature_select'
-    )
-
-    st.session_state['feature'] = feature_input_select
-
-    # TODO: fix this so it isn't misleading what you're training on (article text!)
-    st.write('You selected **{}** as input and **{}** as predicted output.'.format(
-        feature_input_select, feature_predict_select))
+    # feature_input_select = st.selectbox(
+    #     label='Select (encoded) features for classification input',
+    #     options=word_count_encoder_options,
+    #     key='feature_select'
+    # )
+    
+    # st.write('You selected **{}** as input and **{}** as predicted output.'.format(
+    #     feature_input_select, feature_predict_select))
 
     # Task 4: Split train/test
     st.markdown('## Split dataset into Train/Test sets')
@@ -390,9 +381,9 @@ if df is not None:
 
     X_train, X_val, y_train, y_val = [], [], [], []
     # Compute the percentage of test and training data
-    if (feature_predict_select in df.columns):
+    if (feature_predict in df.columns):
         X_train, X_val, y_train, y_val = split_dataset(
-            df, number, feature_predict_select, feature_input_select)
+            df, number, feature_predict, feature_input[0])
 
     classification_methods_options = ['Logistic Regression',
                                       'Random Forest', 
