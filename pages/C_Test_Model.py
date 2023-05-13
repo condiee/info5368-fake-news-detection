@@ -190,7 +190,7 @@ def plot_roc_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
     # Add code here
     for i, model in enumerate(trained_models):
         # model = trained_models[i]
-        st.write(model)
+        # st.write(model)
 
         # Make predictions on the train set using predict_proba() function
         train_probabilities = model.predict_proba(X_train)[:, 1]

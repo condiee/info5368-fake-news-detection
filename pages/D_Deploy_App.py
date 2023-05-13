@@ -1,6 +1,13 @@
 import streamlit as st
 from sklearn.preprocessing import OrdinalEncoder
 import string
+from pandas.api.types import is_string_dtype
+import plotly.express as px
+from nltk.tokenize import TweetTokenizer
+from nltk.corpus import stopwords
+from nltk.sentiment.vader import  SentimentIntensityAnalyzer
+# import nltk
+# nltk.download
 #############################################
 
 st.markdown("# Practical Applications of Machine Learning (PAML)")
@@ -17,13 +24,13 @@ enc = OrdinalEncoder()
 def deploy_model(text):
     """
     Restore the trained model from st.session_state[‘deploy_model’] 
-                and use it to predict the sentiment of the input data    
+                and use it to classify the text data   
     Input: 
         - text
     Output: 
-        - product_sentiment: product sentiment class, +1 or -1
+        - classification, +1 or -1 to indicate fake/real news OR sentiment
     """
-    product_sentiment = None
+    classification = None
     model = None
 
     # Add code here
@@ -32,16 +39,17 @@ def deploy_model(text):
         model = st.session_state['deploy_model']
         
     if(model):
-        product_sentiment = model.predict(text)
+        classification = model.predict(text)
 
     # 2. Predict the product sentiment of the input text using the predict function e.g.,
-    product_sentiment = model.predict(text)
+    classification = model.predict(text)
     
     # return product sentiment
-    return product_sentiment
+    return classification
 
 ###################### FETCH DATASET #######################
 df = None
+
 if 'data' in st.session_state and 'trained_models' in st.session_state and st.session_state['trained_models'] != []:
     df = st.session_state['data']
     # st.write(st.session_state)
@@ -62,9 +70,6 @@ else:
 
 # Deploy App!
 if df is not None:
-    #df.dropna(inplace=True)
-    st.markdown('### Introducing the ML Powered Review Application')
-
     # Input review
     st.markdown('### Use a trained classification method to automatically predict the sentiment of a news article and whether it is real and fake news.')
     
@@ -73,7 +78,10 @@ if df is not None:
         key="user_review",
     )
     if (user_input):
-        st.write(user_input)
+        # st.write(user_input)
+
+        sentiment = SentimentIntensityAnalyzer()
+        sentiment_score = sentiment.polarity_scores(user_input)
 
         translator = str.maketrans('', '', string.punctuation)
         # check if the feature contains string or not
@@ -88,19 +96,25 @@ if df is not None:
                 tfidf_transformer = st.session_state['tfidf_transformer']
                 encoded_user_input = tfidf_transformer.transform(text_count)
             
-            #product_sentiment = st.session_state["deploy_model"].predict(encoded_user_input)
-            product_sentiment = deploy_model(encoded_user_input)
-            sentiment = None
-
-            st.write("**Sentiment prediction:**", product_sentiment[0])
-
-            if(product_sentiment == 1):
-                sentiment = "positive"
-            elif product_sentiment == -1:
+            classification = deploy_model(encoded_user_input)
+            sentiment, score = max(sentiment_score, key=sentiment_score.get), max(sentiment_score.values())
+            if sentiment == 'neu':
+                sentiment = "neutral"
+            elif sentiment == 'pos':
+                sentiment= "positive"
+            elif sentiment == 'neg':
                 sentiment = "negative"
 
-            if sentiment:
-                st.write(f'Your trained model predicts that the news article has a {sentiment} sentiment.')
+            # st.write("CLASSIFICATION:", classification)
 
+            if(classification == 1):
+                decision = "fake"
+            elif classification == 0:
+                decision = "real"
 
+            st.write(f"This article text is predicted to be **{decision}** news with a **{sentiment}** sentiment (score = {score*100}%).")
+
+            
+
+          
 
