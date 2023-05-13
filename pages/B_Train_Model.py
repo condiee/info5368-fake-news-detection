@@ -428,6 +428,8 @@ if df is not None:
             st.write('Logistic Regression Model is untrained')
         else:
             st.write('Logistic Regression Model trained')
+            if st.button("Clear Trained Logistic Regression Model"):
+                del st.session_state[classification_methods_options[0]]
 
     # Task 6: Random Forest
     if (classification_methods_options[1] in classification_model_select or classification_methods_options[1] in trained_models):
@@ -471,6 +473,8 @@ if df is not None:
             st.write('Random Forest Model is untrained')
         else:
             st.write('Random Forest Model trained')
+            if st.button("Clear Trained Random Forest Model"):
+                del st.session_state[classification_methods_options[1]]
 
     # Task 7: SVM
     if (classification_methods_options[2] in classification_model_select or classification_methods_options[2] in trained_models):
@@ -512,6 +516,8 @@ if df is not None:
             st.write('SVM Model is untrained')
         else:
             st.write('SVM Model trained')
+            if st.button("Clear Trained SVM Model"):
+                del st.session_state[classification_methods_options[2]]
 
     # Task 8: Naive Bayes
     if (classification_methods_options[3] in classification_model_select or classification_methods_options[3] in trained_models):
@@ -542,8 +548,14 @@ if df is not None:
             st.write('Naieve Bayes Model is untrained')
         else:
             st.write('Naive Bayes Model trained')
+            if st.button("Clear Trained Naive Bayes Model"):
+                del st.session_state[classification_methods_options[3]]
 
-    
+    st.write("#### DANGER ZONE: Clear all trained models?")
+    if st.button("Clear All Trained Models"):
+        for model in classification_methods_options:
+            if model in st.session_state:
+                del st.session_state[model]
 
     # Task 9: Inspect classification coefficients
     st.markdown('## Inspect model coefficients')
