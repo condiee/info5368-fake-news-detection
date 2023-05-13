@@ -277,8 +277,8 @@ if df is not None:
     metric_options = ['precision', 'recall', 'accuracy', 'f1 score']
 
     classification_methods_options = ['Logistic Regression',
-                                      'Stochastic Gradient Descent with Logistic Regression',
-                                      'Stochastic Gradient Descent with Cross Validation',
+                                    #   'Stochastic Gradient Descent with Logistic Regression',
+                                    #   'Stochastic Gradient Descent with Cross Validation',
                                       'Random Forest', 
                                       'SVM', 
                                       'Naïve Bayes']
