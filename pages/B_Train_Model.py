@@ -361,6 +361,10 @@ if df is not None:
                                       'Random Forest', 
                                       'SVM', 
                                       'Naïve Bayes']
+    coefficient_models_options = ['Logistic Regression', 
+                                      'SVM', 
+                                      'Naïve Bayes']
+
 
     trained_models = [
         model for model in classification_methods_options if model in st.session_state]
@@ -593,7 +597,7 @@ if df is not None:
     # Select multiple models to inspect
     inspect_models = st.multiselect(
         label='Select features for classification input',
-        options=classification_model_select,
+        options= coefficient_models_options,
         key='inspect_multiselect'
     )
 
