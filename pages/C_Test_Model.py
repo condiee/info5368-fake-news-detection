@@ -139,17 +139,17 @@ def plot_pr_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
             # v. Compute precision and recall on the training set using the predictions on the
             # training set (with threshold applied) and the true values (y_train). Use
             # precision_score (set zero_division=1) and recall_score functions.
-            train_precision = precision_score(y_train, train_predictions, zero_division=1) # , pos_label=1, average=None
+            train_precision = precision_score(y_train, train_predictions, zero_division=1, average = 'weighted') # , pos_label=1, average=None
             train_precision_all += [train_precision]
-            train_recall = recall_score(y_train, train_predictions)
+            train_recall = recall_score(y_train, train_predictions, zero_division=1, average = 'weighted')
             train_recall_all += [train_recall]
 
             # vi. Compute precision and recall on validation set using the predictions on the
             # validation set (with threshold applied) and the true values (y_val). Use
             # precision_score (set zero_division=1) and recall_score functions
-            val_precision = precision_score(y_val, val_predictions, zero_division=1) # , pos_label=1, average=None
+            val_precision = precision_score(y_val, val_predictions, zero_division=1, average = 'weighted') # , pos_label=1, average=None
             val_precision_all += [val_precision]
-            val_recall = recall_score(y_val, val_predictions)
+            val_recall = recall_score(y_val, val_predictions, zero_division=1, average = 'weighted')
             val_recall_all += [val_recall]
 
         # 2. Plot a Precision/Recall Curves showing the results on training and validation sets using the
