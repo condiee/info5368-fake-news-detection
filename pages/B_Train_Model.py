@@ -9,6 +9,7 @@ from sklearn.naive_bayes import GaussianNB
 import random
 from helper_functions import fetch_dataset, set_pos_neg_reviews
 random.seed(10)
+from sklearn.naive_bayes import MultinomialNB
 #############################################
 
 st.markdown("# Practical Applications of Machine Learning (PAML)")
@@ -109,6 +110,7 @@ def train_logistic_regression(X_train, y_train, model_name, params, random_state
     
 #         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = lg_model
+        st.session[model_name + '_coef'] = lg_model.coef_
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***",e.args)
@@ -130,6 +132,8 @@ def train_grid_logistic_regression(X_train, y_train, model_name):
         lg_model = GridSearchCV(lg, param_grid, cv=10)
         lg_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = lg_model
+        x = lg_model.best_estimator_
+        st.session[model_name + '_coef'] = x.coef_
         st.write("tuned hpyerparameters: (best parameters) ",lg_model.best_params_)
         st.write("accuracy :",lg_model.best_score_)
     except Exception as e:
@@ -147,6 +151,8 @@ def train_grid_random_forest(X_train, y_train, model_name):
         rf_model = GridSearchCV(rf, param_grid, cv=5)
         rf_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = rf_model
+        x = rf_model.best_estimator_
+        st.session[model_name + '_coef'] = x.coef_
         st.write("tuned hpyerparameters: (best parameters) ", rf_model.best_params_)
         st.write("accuracy :", rf_model.best_score_)
     except Exception as e:
@@ -170,6 +176,7 @@ def train_random_forest(X_train, y_train, model_name, params, random_state=42):
     
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = rf_model
+        st.session[model_name + '_coef'] = rf_model.coef_
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***",e.args)
@@ -186,6 +193,8 @@ def train_grid_svm(X_train, y_train, model_name):
         svm_model = GridSearchCV(svm, param_grid, cv=5)
         svm_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = svm_model
+        x = svm_model.best_estimator_
+        st.session[model_name + '_coef'] = x.coef_
         st.write("tuned hpyerparameters: (best parameters) ", svm_model.best_params_)
         st.write("accuracy :", svm_model.best_score_)
     except Exception as e:
@@ -208,6 +217,7 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
     
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = svm_model
+        st.session[model_name + '_coef'] = svm_model.coef_
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***",e.args)
@@ -219,11 +229,13 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
 def train_grid_naive_bayes(X_train, y_train, model_name):
     nb = None
     try:
-        nb = GaussianNB()
-        param_grid = {'var_smoothing' : [1e-9, 1e-8, 1e-7, 1e-6, 1e-5]}       
-        nb_model = GridSearchCV(nb, param_grid, cv=5)
+        nb = MultinomialNB()
+        param_grid = {'alpha': [0.1, 0.5, 1.0],'fit_prior': [True, False]}     
+        nb_model = GridSearchCV(nb, param_grid, cv=5, n_jobs = -1)
         nb_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = nb_model
+        x = nb_model.best_estimator_
+        st.session[model_name + '_coef'] = x.coef_
         st.write("tuned hpyerparameters: (best parameters) ", nb_model.best_params_)
         st.write("accuracy :", nb_model.best_score_)
     except Exception as e:
@@ -239,7 +251,7 @@ def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
     # Add code here
     # 1. Create a try and except block to train a logistic regression model.
     try:
-        nb_model = GaussianNB(var_smoothing=params['var_smoothing'])
+        nb_model = MultinomialNB(alpha = params['alpha'], fit_prior=params['fit_prior'])
 
             # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
             # Remember to create a continuous y_train array using np.ravel() function.
@@ -247,6 +259,7 @@ def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
     
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = nb_model
+        st.session[model_name + '_coef'] = np.exp(nb_model.feature_log_prob_)
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***", e.args)
@@ -282,20 +295,44 @@ def inspect_coefficients(trained_models):
         # b. If the model is valid, store the coefficients in out_dict[name] using model.coef
         # (same for all models) and display the coefficients.
         if model is not None:
-            out_dict[name] = model.coef_
-            st.write(f"**{name}** coefficents: {model.coef_[0]}")
+            #if name == 'Naïve Bayes':
+            #    out_dict[name] = np.exp(model.feature_log_prob_)
+            #    st.write(f"**{name}** coefficents: {np.exp(model.feature_log_prob_)[0]}")
+            #    st.write(f"There are {len(np.exp(model.feature_log_prob_[0]))} total coefficients.")
 
+                # ii. Number of positive coefficients
+            #    st.write(f"There are {sum([x for x in np.exp(model.feature_log_prob_)[0]>=0])} positive coefficients.")
+
+                # iii. Number of negative coefficients
+            #    st.write(f"There are {sum([x for x in np.exp(model.feature_log_prob_)[0]<0])} negative coefficients.")
+            #else:
+            #    out_dict[name] = model.coef_
+            #    out_dict[name] = model.coef_
+            # c. Compute and print the following values:
+            # i. Total number of coefficients
+            #    out_dict[name] = model.coef_
+
+                # ii. Number of positive coefficients
+           #     st.write(f"There are {sum([x for x in model.coef_[0]>=0])} positive coefficients.")
+
+                # iii. Number of negative coefficients
+            #    st.write(f"There are {sum([x for x in model.coef_[0]<0])} negative coefficients.")
+            coef = st.session_state[name + "_coef"]
+            out_dict[name] = coef
+            st.write(f"**{name}** coefficents: {model.coef_[0]}")
             # c. Compute and print the following values:
             # i. Total number of coefficients
             st.write(f"There are {len(model.coef_[0])} total coefficients.")
 
-            # ii. Number of positive coefficients
+                # ii. Number of positive coefficients
             st.write(f"There are {sum([x for x in model.coef_[0]>=0])} positive coefficients.")
 
-            # iii. Number of negative coefficients
+                # iii. Number of negative coefficients
             st.write(f"There are {sum([x for x in model.coef_[0]<0])} negative coefficients.")
 
+            
     # 3. Display ‘cv_results_’ in st.session_state[‘cv_results_’] if it exists (from Checkpoint 7)
+
     if 'cv_results_' in st.session_state:
         st.write("**Cross Validation Results:**", st.session_state['cv_results_'])
                         
@@ -558,18 +595,25 @@ if df is not None:
                 train_grid_naive_bayes(
                     X_train, y_train, classification_methods_options[3])
         elif nb_param_options == hyp_training_options[1]:
-            var = st.number_input(
-            label='Enter the value of var smoothing',
-            min_value=0.0000001,
-            max_value=0.1,
+            alpha = st.number_input(
+            label='Enter the value of alpha',
+            min_value=0.1,
+            max_value= 1.0,
             value=0.1,
             step=0.01,
-            key='nb_var_numberinput'
+            key='nb_alpha_numberinput'
             )
-            st.write('You set var smoothing to: {}'.format(var))
+            st.write('You set alpha smoothing to: {}'.format(alpha))
+            fit_prior = st.selectbox(
+                label='Select fit prior value',
+                options=[True, False],
+                key='nb_fit_multiselect'
+            )
+            st.write('You set fit prior to: {}'.format(fit_prior))
 
             nb_params = {
-            'var_smoothing': var,
+            'alpha': alpha,
+            'fit_prior' : fit_prior
             }
             if st.button('Train Naive Bayes Model'):
                 train_naive_bayes(
