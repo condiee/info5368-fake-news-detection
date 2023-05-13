@@ -367,10 +367,12 @@ if df is not None:
     if (classification_methods_options[0] in classification_model_select or classification_methods_options[0] in trained_models):
         st.markdown('#### ' + classification_methods_options[0])
 
-        if st.button('Train Logistic Regression'): # with Grid Search Cross Validation for Best Parameters
-            train_grid_logistic_regression(
-                X_train, y_train, classification_methods_options[0])
-        else:
+        param_options = st.selectbox('Select how to choose hyperparameters', options=['Use Grid Search Cross Validation for Best Parameters', 'Enter Parameters Manually'])
+        if param_options == 'Use Grid Search Cross Validation for Best Parameters':
+            if st.button('Train Logistic Regression Model using Grid Search'):
+                train_grid_logistic_regression(
+                    X_train, y_train, classification_methods_options[0])
+        elif param_options == 'Enter Parameters Manually':
             lg_col1, lg_col2 = st.columns(2)
             with (lg_col1):
                  # solver: algorithm to use in the optimization problem
