@@ -139,7 +139,7 @@ def plot_pr_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
             # v. Compute precision and recall on the training set using the predictions on the
             # training set (with threshold applied) and the true values (y_train). Use
             # precision_score (set zero_division=1) and recall_score functions.
-            train_precision = precision_score(y_train, train_predictions, zero_division=1)
+            train_precision = precision_score(y_train, train_predictions, zero_division=1) # , pos_label=1, average=None
             train_precision_all += [train_precision]
             train_recall = recall_score(y_train, train_predictions)
             train_recall_all += [train_recall]
@@ -147,7 +147,7 @@ def plot_pr_curve(X_train, X_val, y_train, y_val, trained_models, model_names):
             # vi. Compute precision and recall on validation set using the predictions on the
             # validation set (with threshold applied) and the true values (y_val). Use
             # precision_score (set zero_division=1) and recall_score functions
-            val_precision = precision_score(y_val, val_predictions, zero_division=1)
+            val_precision = precision_score(y_val, val_predictions, zero_division=1) # , pos_label=1, average=None
             val_precision_all += [val_precision]
             val_recall = recall_score(y_val, val_predictions)
             val_recall_all += [val_recall]
@@ -310,6 +310,9 @@ if df is not None:
                 label='Select plot option(s)',
                 options=plot_options
             )
+
+            st.write(df.label.value_counts())
+
             ############## Task 10: Compute evaluation metrics
             if 'Confusion Matrix' in review_plot:
                 models = [st.session_state[model]

@@ -177,8 +177,7 @@ def train_random_forest(X_train, y_train, model_name, params, random_state=42):
 def train_grid_svm(X_train, y_train, model_name):
     svm = None
     try:
-        svm = SVC()
-        ## changed to e here
+        svm = SVC(probability=True)
         param_grid = {'kernel' : ['linear', 'poly', 'rbf', 'sigmoid'], 'C' : [0.001, 0.01, 0.1, 1, 10, 100]}        
         svm_model = GridSearchCV(svm, param_grid, cv=5)
         svm_model.fit(X_train, np.ravel(y_train))
@@ -195,7 +194,6 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
     svm_model = None
     # Add code here
     try:
-        ## changed to e here
         svm_model = SVC(random_state=random_state, kernel=params['kernel'], 
                                       C=params['C'])
 
