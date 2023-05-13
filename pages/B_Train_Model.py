@@ -161,7 +161,7 @@ def train_random_forest(X_train, y_train, model_name, params, random_state=42):
 
             # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
             # Remember to create a continuous y_train array using np.ravel() function.
-        rf_model.fit(X_train, y_train)
+        rf_model.fit(X_train, np.ravel(y_train))
     
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = rf_model
@@ -197,7 +197,7 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
 
             # 3. Fit the model to the data using the fit() function with input data X_train, y_train.
             # Remember to create a continuous y_train array using np.ravel() function.
-        svm_model.fit(X_train, y_train)
+        svm_model.fit(X_train, np.ravel(y_train))
     
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = svm_model
@@ -321,7 +321,7 @@ if df is not None:
 
     # Select input features
     feature_input_select = st.selectbox(
-        label='Select features for classification input',
+        label='Select (encoded) features for classification input',
         options=word_count_encoder_options,
         key='feature_select'
     )
@@ -329,7 +329,7 @@ if df is not None:
     st.session_state['feature'] = feature_input_select
 
     # TODO: fix this so it isn't misleading what you're training on (article text!)
-    st.write('You selected input {} and output {}'.format(
+    st.write('You selected **{}** as input and **{}** as predicted output.'.format(
         feature_input_select, feature_predict_select))
 
     # Task 4: Split train/test
@@ -358,21 +358,24 @@ if df is not None:
         label='Select regression model for prediction',
         options=classification_methods_options,
     )
-    st.write('You selected the follow models: {}'.format(
+    st.write('You selected the following models to train: {}'.format(
         classification_model_select))
 
     # Add parameter options to each regression method
+    hyp_training_options = ['Use Grid Search Cross Validation to find the best parameters', 'Enter Parameters Manually']
 
     # Task 5: Logistic Regression
     if (classification_methods_options[0] in classification_model_select or classification_methods_options[0] in trained_models):
         st.markdown('#### ' + classification_methods_options[0])
 
-        param_options = st.selectbox('Select how to choose hyperparameters', options=['Use Grid Search Cross Validation for Best Parameters', 'Enter Parameters Manually'])
-        if param_options == 'Use Grid Search Cross Validation for Best Parameters':
+        logit_param_options = st.selectbox('Select how to choose hyperparameters', 
+                                           options=hyp_training_options,
+                                           key='logit')
+        if logit_param_options == hyp_training_options[0]:
             if st.button('Train Logistic Regression Model using Grid Search'):
                 train_grid_logistic_regression(
                     X_train, y_train, classification_methods_options[0])
-        elif param_options == 'Enter Parameters Manually':
+        elif logit_param_options == hyp_training_options[1]:
             lg_col1, lg_col2 = st.columns(2)
             with (lg_col1):
                  # solver: algorithm to use in the optimization problem
@@ -435,10 +438,14 @@ if df is not None:
     if (classification_methods_options[1] in classification_model_select or classification_methods_options[1] in trained_models):
         st.markdown('#### ' + classification_methods_options[1])
 
-        if st.button('Train Random Forest with Grid Search Best Parameters'):
-            train_grid_random_forest(
-                X_train, y_train, classification_methods_options[1])
-        else:
+        rf_param_options = st.selectbox('Select how to choose hyperparameters',
+                                        options=hyp_training_options,
+                                        key='rf')
+        if rf_param_options == hyp_training_options[0]:
+            if st.button('Train Random Forest Model using Grid Search'):
+                train_grid_random_forest(
+                    X_train, y_train, classification_methods_options[1])
+        elif rf_param_options == hyp_training_options[1]:
             rf_col1, rf_col2 = st.columns(2)
             with (rf_col1):
                 n_est = st.number_input(
@@ -479,11 +486,15 @@ if df is not None:
     # Task 7: SVM
     if (classification_methods_options[2] in classification_model_select or classification_methods_options[2] in trained_models):
         st.markdown('#### ' + classification_methods_options[2])
-
-        if st.button('Train SVM with Grid Search Best Parameters'):
-            train_grid_svm(
+            
+        svm_param_options = st.selectbox('Select how to choose hyperparameters', 
+                                           options=hyp_training_options,
+                                           key='svm')
+        if svm_param_options == hyp_training_options[0]:
+            if st.button('Train SVM Model using Grid Search'):
+                train_grid_svm(
                 X_train, y_train, classification_methods_options[2])
-        else:
+        elif svm_param_options == hyp_training_options[1]:
             svm_col1, svm_col2 = st.columns(2)
             with (svm_col1):
                 c = st.number_input(
@@ -523,10 +534,14 @@ if df is not None:
     if (classification_methods_options[3] in classification_model_select or classification_methods_options[3] in trained_models):
         st.markdown('#### ' + classification_methods_options[3])
 
-        if st.button('Train Naive Bayes with Grid Search Best Parameters'):
-            train_grid_naive_bayes(
-                X_train, y_train, classification_methods_options[3])
-        else:
+        nb_param_options = st.selectbox('Select how to choose hyperparameters',
+                                        options=hyp_training_options,
+                                        key='nb')
+        if nb_param_options == hyp_training_options[0]:
+            if st.button('Train Naïve Bayes Model using Grid Search'):
+                train_grid_naive_bayes(
+                    X_train, y_train, classification_methods_options[3])
+        elif nb_param_options == hyp_training_options[1]:
             var = st.number_input(
             label='Enter the value of var smoothing',
             min_value=0.0000001,
@@ -551,11 +566,14 @@ if df is not None:
             if st.button("Clear Trained Naive Bayes Model"):
                 del st.session_state[classification_methods_options[3]]
 
-    st.write("#### DANGER ZONE: Clear all trained models?")
-    if st.button("Clear All Trained Models"):
-        for model in classification_methods_options:
-            if model in st.session_state:
-                del st.session_state[model]
+    # st.write("#### DANGER ZONE: Clear all trained models?")
+    # if st.button("Clear All Trained Models"):
+    #     for model in classification_methods_options:
+    #         st.write('checking', model)
+    #         if model in st.session_state:
+    #             st.write('in stsate')
+    #             del st.session_state[model]
+    #             st.write('del', st.session_state) # doesn't refresh
 
     # Task 9: Inspect classification coefficients
     st.markdown('## Inspect model coefficients')
