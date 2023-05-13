@@ -145,6 +145,8 @@ def train_grid_random_forest(X_train, y_train, model_name):
         rf_model = GridSearchCV(rf, param_grid, cv=5)
         rf_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = rf_model
+        st.write("tuned hpyerparameters: (best parameters) ", rf_model.best_params_)
+        st.write("accuracy :", rf_model.best_score_)
     except Exception as e:
         print('Exception thrown; cannot train random forest model. ERROR:', e)
 
@@ -181,6 +183,8 @@ def train_grid_svm(X_train, y_train, model_name):
         svm_model = GridSearchCV(svm, param_grid, cv=5)
         svm_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = svm_model
+        st.write("tuned hpyerparameters: (best parameters) ", svm_model.best_params_)
+        st.write("accuracy :", svm_model.best_score_)
     except Exception as e:
         print('Exception thrown; cannot train svm model. ERROR:', e)
     # 5. Return the trained model
@@ -216,6 +220,8 @@ def train_grid_naive_bayes(X_train, y_train, model_name):
         nb_model = GridSearchCV(nb, param_grid, cv=5)
         nb_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = nb_model
+        st.write("tuned hpyerparameters: (best parameters) ", nb_model.best_params_)
+        st.write("accuracy :", nb_model.best_score_)
     except Exception as e:
         print('Exception thrown; cannot train naive bayes model. ERROR:', e)
 
