@@ -6,8 +6,7 @@ import plotly.express as px
 from nltk.tokenize import TweetTokenizer
 from nltk.corpus import stopwords
 from nltk.sentiment.vader import  SentimentIntensityAnalyzer
-# import nltk
-# nltk.download
+import pandas as pd
 #############################################
 
 st.markdown("# Practical Applications of Machine Learning (PAML)")
@@ -80,23 +79,26 @@ if df is not None:
     if (user_input):
         # st.write(user_input)
 
-        sentiment = SentimentIntensityAnalyzer()
-        sentiment_score = sentiment.polarity_scores(user_input)
-
         translator = str.maketrans('', '', string.punctuation)
         # check if the feature contains string or not
         user_input_updates = user_input.translate(translator)
         
         if 'count_vect' in st.session_state:
-            count_vect = st.session_state['count_vect']
+            count_vect = st.session_state['count_vect']            
             text_count = count_vect.transform([user_input_updates])
-            # Initialize encoded_user_input with text_count as default
-            encoded_user_input = text_count
+
+            if model_select == 'SVM':
+                encoded_user_input = pd.DataFrame(text_count.toarray())
+            else: 
+                encoded_user_input = text_count
+            
             if 'tfidf_transformer' in st.session_state:
                 tfidf_transformer = st.session_state['tfidf_transformer']
-                encoded_user_input = tfidf_transformer.transform(text_count)
-            
-            classification = deploy_model(encoded_user_input)
+                encoded_user_input = tfidf_transformer.transform(text_count) #.toarray()
+
+            # SENTIMENT ANALYSIS
+            sentiment = SentimentIntensityAnalyzer()
+            sentiment_score = sentiment.polarity_scores(user_input)
             sentiment, score = max(sentiment_score, key=sentiment_score.get), max(sentiment_score.values())
             if sentiment == 'neu':
                 sentiment = "neutral"
@@ -106,7 +108,8 @@ if df is not None:
                 sentiment = "negative"
 
             # st.write("CLASSIFICATION:", classification)
-
+            classification = deploy_model(encoded_user_input)
+            st.write("classification:", classification[0])
             if(classification == 1):
                 decision = "fake"
             elif classification == 0:
