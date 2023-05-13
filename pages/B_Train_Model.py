@@ -110,6 +110,7 @@ def train_logistic_regression(X_train, y_train, model_name, params, random_state
     
 #         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = lg_model
+        st.session[model_name + '_coef'] = lg_model.coef_
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***",e.args)
@@ -131,6 +132,8 @@ def train_grid_logistic_regression(X_train, y_train, model_name):
         lg_model = GridSearchCV(lg, param_grid, cv=10)
         lg_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = lg_model
+        x = lg_model.best_estimator_
+        st.session[model_name + '_coef'] = x.coef_
         st.write("tuned hpyerparameters: (best parameters) ",lg_model.best_params_)
         st.write("accuracy :",lg_model.best_score_)
     except Exception as e:
@@ -148,6 +151,8 @@ def train_grid_random_forest(X_train, y_train, model_name):
         rf_model = GridSearchCV(rf, param_grid, cv=5)
         rf_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = rf_model
+        x = rf_model.best_estimator_
+        st.session[model_name + '_coef'] = x.coef_
         st.write("tuned hpyerparameters: (best parameters) ", rf_model.best_params_)
         st.write("accuracy :", rf_model.best_score_)
     except Exception as e:
@@ -171,6 +176,7 @@ def train_random_forest(X_train, y_train, model_name, params, random_state=42):
     
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = rf_model
+        st.session[model_name + '_coef'] = rf_model.coef_
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***",e.args)
@@ -187,6 +193,8 @@ def train_grid_svm(X_train, y_train, model_name):
         svm_model = GridSearchCV(svm, param_grid, cv=5)
         svm_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = svm_model
+        x = svm_model.best_estimator_
+        st.session[model_name + '_coef'] = x.coef_
         st.write("tuned hpyerparameters: (best parameters) ", svm_model.best_params_)
         st.write("accuracy :", svm_model.best_score_)
     except Exception as e:
@@ -209,6 +217,7 @@ def train_svm(X_train, y_train, model_name, params, random_state=42):
     
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = svm_model
+        st.session[model_name + '_coef'] = svm_model.coef_
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***",e.args)
@@ -225,6 +234,8 @@ def train_grid_naive_bayes(X_train, y_train, model_name):
         nb_model = GridSearchCV(nb, param_grid, cv=5, n_jobs = -1)
         nb_model.fit(X_train, np.ravel(y_train))
         st.session_state[model_name] = nb_model
+        x = nb_model.best_estimator_
+        st.session[model_name + '_coef'] = x.coef_
         st.write("tuned hpyerparameters: (best parameters) ", nb_model.best_params_)
         st.write("accuracy :", nb_model.best_score_)
     except Exception as e:
@@ -248,6 +259,7 @@ def train_naive_bayes(X_train, y_train, model_name, params, random_state=42):
     
         # 4. Save the model in st.session_state[model_name].
         st.session_state[model_name] = nb_model
+        st.session[model_name + '_coef'] = np.exp(nb_model.feature_log_prob_)
 
     except Exception as e:
         st.write("***Please choose different hyperparameters:***", e.args)
@@ -283,30 +295,44 @@ def inspect_coefficients(trained_models):
         # b. If the model is valid, store the coefficients in out_dict[name] using model.coef
         # (same for all models) and display the coefficients.
         if model is not None:
-            if name == 'Naïve Bayes':
-                out_dict[name] = np.exp(model.feature_log_prob_)
-                st.write(f"**{name}** coefficents: {np.exp(model.feature_log_prob_)[0]}")
-                st.write(f"There are {len(np.exp(model.feature_log_prob_[0]))} total coefficients.")
+            #if name == 'Naïve Bayes':
+            #    out_dict[name] = np.exp(model.feature_log_prob_)
+            #    st.write(f"**{name}** coefficents: {np.exp(model.feature_log_prob_)[0]}")
+            #    st.write(f"There are {len(np.exp(model.feature_log_prob_[0]))} total coefficients.")
 
                 # ii. Number of positive coefficients
-                st.write(f"There are {sum([x for x in np.exp(model.feature_log_prob_)[0]>=0])} positive coefficients.")
+            #    st.write(f"There are {sum([x for x in np.exp(model.feature_log_prob_)[0]>=0])} positive coefficients.")
 
                 # iii. Number of negative coefficients
-                st.write(f"There are {sum([x for x in np.exp(model.feature_log_prob_)[0]<0])} negative coefficients.")
-            else:
-                out_dict[name] = model.coef_
-                st.write(f"**{name}** coefficents: {model.coef_[0]}")
+            #    st.write(f"There are {sum([x for x in np.exp(model.feature_log_prob_)[0]<0])} negative coefficients.")
+            #else:
+            #    out_dict[name] = model.coef_
+            #    out_dict[name] = model.coef_
             # c. Compute and print the following values:
             # i. Total number of coefficients
-                st.write(f"There are {len(model.coef_[0])} total coefficients.")
+            #    out_dict[name] = model.coef_
 
                 # ii. Number of positive coefficients
-                st.write(f"There are {sum([x for x in model.coef_[0]>=0])} positive coefficients.")
+           #     st.write(f"There are {sum([x for x in model.coef_[0]>=0])} positive coefficients.")
 
                 # iii. Number of negative coefficients
-                st.write(f"There are {sum([x for x in model.coef_[0]<0])} negative coefficients.")
+            #    st.write(f"There are {sum([x for x in model.coef_[0]<0])} negative coefficients.")
+            coef = st.session_state[name + "_coef"]
+            out_dict[name] = coef
+            st.write(f"**{name}** coefficents: {model.coef_[0]}")
+            # c. Compute and print the following values:
+            # i. Total number of coefficients
+            st.write(f"There are {len(model.coef_[0])} total coefficients.")
 
+                # ii. Number of positive coefficients
+            st.write(f"There are {sum([x for x in model.coef_[0]>=0])} positive coefficients.")
+
+                # iii. Number of negative coefficients
+            st.write(f"There are {sum([x for x in model.coef_[0]<0])} negative coefficients.")
+
+            
     # 3. Display ‘cv_results_’ in st.session_state[‘cv_results_’] if it exists (from Checkpoint 7)
+
     if 'cv_results_' in st.session_state:
         st.write("**Cross Validation Results:**", st.session_state['cv_results_'])
                         
