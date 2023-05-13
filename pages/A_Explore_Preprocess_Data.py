@@ -197,6 +197,11 @@ if df is not None:
         df, data_cleaned = clean_data(df)
         if (data_cleaned):
             st.markdown('Cleaned Dataset')
+            st.markdown('- All text lowercase')
+            st.markdown('- Urls and links removed')
+            st.markdown('- Punction removed')
+            st.markdown('- Stopwords removed')
+            st.markdown('- Null values removed')
             st.dataframe(df)
 
     st.markdown('## Visualize Features')
