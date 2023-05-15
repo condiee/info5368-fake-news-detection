@@ -73,10 +73,11 @@ def compute_eval_metrics(X, y_true, model, metrics):
 
 #confusion matrix
 ## referenced https://www.kaggle.com/code/sahrul/fake-news-detection-using-cnn
-def plot_cmatrix(X, y_true, model):
+def plot_cmatrix(X, y_true, model_name, model):
     pred = model.predict(X)
     cmatrix = confusion_matrix(y_true, pred)
     fig, ax = plt.subplots(figsize=(8, 8))
+    ax.set_title(model_name)
     cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = cmatrix, display_labels = [False, True])
     cm_display.plot(ax=ax)
     st.pyplot(fig)
@@ -313,12 +314,12 @@ if df is not None:
 
             ############## Task 10: Compute evaluation metrics
             if 'Confusion Matrix' in review_plot:
-                models = [st.session_state[model]
-                          for model in model_select]
+                models = {model: st.session_state[model]
+                          for model in model_select}
                 #trained_select = [st.session_state[model]
                 #                 for model in model_select]
-                for model in models:
-                    plot_cmatrix(X_train, y_train, model)
+                for model_name, model in models.items():
+                    plot_cmatrix(X_train, y_train, model_name, model)
             if 'Precision/Recall Curve' in review_plot:
                 trained_select = [st.session_state[model]
                                   for model in model_select]
