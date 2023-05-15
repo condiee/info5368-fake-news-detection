@@ -103,7 +103,9 @@ if df is not None:
             # SENTIMENT ANALYSIS
             sentiment = SentimentIntensityAnalyzer()
             sentiment_score = sentiment.polarity_scores(user_input)
+            del sentiment_score['compound']
             sentiment, score = max(sentiment_score, key=sentiment_score.get), max(sentiment_score.values())
+            
             if sentiment == 'neu':
                 sentiment = "neutral"
             elif sentiment == 'pos':
