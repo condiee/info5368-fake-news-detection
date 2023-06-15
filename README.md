@@ -4,10 +4,10 @@
 The use of generative AI combined with an era of mis/disinformation make the ability for humans to discern between real and fake news increasingly difficult. By creating an application that predicts whether articles are real or fake, we aim to help news readers be more informed about current events and to increase trust in reputable news sources. 
 
 Dataset: Fake and Real News Dataset (Kaggle), 21192 articles
-Original Datasets: https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset?resource=download
-Columns: title, article, subject, date
-Date: 12/2015 - 12/2016
-Real and fake news labels included for article classification
+- Original Datasets: https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset?resource=download
+- Columns: title, article, subject, date
+- Dates: 12/2015 - 12/2016
+- Real and fake news labels included for article classification
 
 Models for classification and sentiment analysis:
 - Logistic Regression: Simpler algorithm good for binary classification problems such as fake or real news
